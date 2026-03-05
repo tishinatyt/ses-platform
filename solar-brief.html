@@ -966,8 +966,8 @@ src="https://www.facebook.com/tr?id=190661670459848&ev=PageView&noscript=1"/></n
         <div class="result-item-value">${monthlyGen} кВт·год</div>
       </div>
       <div class="result-item">
-        <div class="result-item-label">Окупність</div>
-        <div class="result-item-value highlight">~${paybackYears} років</div>
+        <div class="result-item-label">Економія/місяць</div>
+        <div class="result-item-value highlight">~${Math.round(monthlyGen * 4.3 / 1000)}k грн</div>
       </div>
     `;
 
