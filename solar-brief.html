@@ -900,45 +900,55 @@ src="https://www.facebook.com/tr?id=190661670459848&ev=PageView&noscript=1"/></n
 
   function buildResult() {
     const kwh = data.kwh;
-    // Правильний розрахунок потужності СЕС
-    const peakSun = 4.2; // середні пікові сонячні години для Чернігова
-    const efficiency = 0.75; // ККД системи з урахуванням втрат (інвертор, кабелі, температура)
-    const dailyKwh = kwh / 30; // споживання на день
-    const systemKw = Math.ceil((dailyKwh / (peakSun * efficiency)) * 10) / 10; // кВт системи
+    const UAH = 43; // 1$ = 43 грн
 
-    // Кількість панелей (550Вт)
-    const panelW = 550;
+    // --- Розрахунок потужності ---
+    // Літній пік: 4.2 год/день, ККД 0.75
+    // Зима дає лише 5-7% від літньої норми — не враховуємо
+    const peakSun = 4.2;
+    const efficiency = 0.75;
+    const dailyKwh = kwh / 30;
+    const systemKw = Math.ceil((dailyKwh / (peakSun * efficiency)) * 10) / 10;
+
+    // --- Панелі 455Вт ---
+    const panelW = 455;
     const panels = Math.ceil(systemKw * 1000 / panelW);
-    const actualKw = (panels * panelW / 1000).toFixed(1);
+    const actualKw = parseFloat((panels * panelW / 1000).toFixed(1));
 
-    // Реальні ціни (оновлено)
-    const panelPrice = panels * 90; // $90 за панель 550W
+    // Ціна панелей: 2900 грн/шт + 3000 грн доставка
+    const panelPriceUAH = panels * 2900 + 3000;
+
+    // --- Інвертор Deye (гібрид) ---
     const inverterKw = actualKw <= 5 ? 5 : 10;
-    const inverterPrice = inverterKw <= 5 ? 970 : 1900; // Deye 5кВт / 10кВт
+    const inverterPriceUAH = inverterKw <= 5 ? 42500 : 85000;
 
-    let batteryPrice = 0;
+    // --- Кріплення та кабель (~1430 грн/кВт + 300 доставка/кВт) ---
+    const mountingUAH = Math.round(actualKw * 1430 + actualKw * 300);
+
+    // --- Робота: $85/кВт ---
+    const workUAH = Math.round(actualKw * 85 * UAH);
+
+    // --- АКБ: 2 × кВт панелей (Deye 5кВт = 42500 грн) ---
+    let batteryUAH = 0;
     let batteryLabel = '';
+    let batteryCount = 0;
     if (data.battery === 'yes') {
-      // $1000 за 5кВт·год, підбираємо кількість
-      const batteryUnits = kwh < 300 ? 1 : kwh < 600 ? 2 : 3;
-      batteryPrice = batteryUnits * 1000;
-      batteryLabel = `Акумулятор ${batteryUnits * 5} кВт·год (${batteryUnits} × 5кВт·год)`;
+      batteryCount = Math.ceil(actualKw * 2 / 5); // 2×кВт / 5кВт на АКБ
+      batteryUAH = batteryCount * 42500;
+      batteryLabel = `АКБ Deye ${batteryCount * 5} кВт·год (${batteryCount} × 5 кВт·год)`;
     }
 
-    const mountExtra = data.roofType === 'flat' ? 200 : data.roofType === 'ground' ? 350 : 0;
-    const mountingPrice = Math.round(actualKw * 200 + mountExtra); // $200/кВт
-    const cablesPrice = Math.round(actualKw * 100); // $100/кВт (матеріали)
+    // --- Підсумок ---
+    const totalUAH = panelPriceUAH + inverterPriceUAH + mountingUAH + workUAH + batteryUAH;
+    const totalUSD = Math.round(totalUAH / UAH);
 
-    const subtotal = panelPrice + inverterPrice + batteryPrice + mountingPrice + cablesPrice;
-    const total = Math.round(subtotal * 1.05); // +5% інші витрати
+    // --- Окупність ---
+    // Тариф ~4.3 грн/кВт·год, економія = вироблення × тариф
+    const monthlyGen = Math.round(actualKw * peakSun * 30 * efficiency);
+    const savingMonthUAH = monthlyGen * 4.3;
+    const paybackYears = Math.round((totalUAH / savingMonthUAH / 12) * 10) / 10;
 
-    // Окупність
-    const savingPerMonth = Math.round(kwh * 4.3); // ~4.3 грн/кВт·год
-    const paybackMonths = Math.round((total / (savingPerMonth / 1000) * 45)); // rough UAH->USD
-    const paybackYears = (paybackYears2 = (total / (savingPerMonth * 0.025))); // $0.025/kWh avg
-    const py = Math.round(paybackYears2 / 12 * 10) / 10;
-
-    // Fill UI
+    // --- UI ---
     document.getElementById('result-sub').textContent =
       `${document.getElementById('clientName').value}, ось розрахунок для ${document.getElementById('clientCity').value}`;
 
@@ -949,32 +959,32 @@ src="https://www.facebook.com/tr?id=190661670459848&ev=PageView&noscript=1"/></n
       </div>
       <div class="result-item">
         <div class="result-item-label">Кількість панелей</div>
-        <div class="result-item-value">${panels} шт × 550 Вт</div>
+        <div class="result-item-value">${panels} шт × ${panelW} Вт</div>
       </div>
       <div class="result-item">
         <div class="result-item-label">Вироблення/місяць</div>
-        <div class="result-item-value">${Math.round(actualKw * peakSun * 30 * efficiency)} кВт·год</div>
+        <div class="result-item-value">${monthlyGen} кВт·год</div>
       </div>
       <div class="result-item">
         <div class="result-item-label">Окупність</div>
-        <div class="result-item-value highlight">~${py} років</div>
+        <div class="result-item-value highlight">~${paybackYears} років</div>
       </div>
     `;
 
     let equipHtml = `
-      <div class="equip-row"><span class="equip-name">☀️ Панелі ${panelW}Вт × ${panels}шт</span><span class="equip-price">$${panelPrice}</span></div>
-      <div class="equip-row"><span class="equip-name">⚡ Інвертор Deye ${inverterKw}кВт</span><span class="equip-price">$${inverterPrice}</span></div>
+      <div class="equip-row"><span class="equip-name">☀️ Панелі ${panelW}Вт × ${panels}шт</span><span class="equip-price">${Math.round(panelPriceUAH/1000)}k грн</span></div>
+      <div class="equip-row"><span class="equip-name">⚡ Інвертор Deye ${inverterKw}кВт гібрид</span><span class="equip-price">${Math.round(inverterPriceUAH/1000)}k грн</span></div>
     `;
     if (batteryLabel) {
-      equipHtml += `<div class="equip-row"><span class="equip-name">🔋 ${batteryLabel}</span><span class="equip-price">$${batteryPrice}</span></div>`;
+      equipHtml += `<div class="equip-row"><span class="equip-name">🔋 ${batteryLabel}</span><span class="equip-price">${Math.round(batteryUAH/1000)}k грн</span></div>`;
     }
     equipHtml += `
-      <div class="equip-row"><span class="equip-name">🔧 Монтаж та кріплення</span><span class="equip-price">$${mountingPrice}</span></div>
-      <div class="equip-row"><span class="equip-name">🔌 Матеріали та кабелі</span><span class="equip-price">$${cablesPrice}</span></div>
+      <div class="equip-row"><span class="equip-name">🔧 Кріплення та кабель</span><span class="equip-price">${Math.round(mountingUAH/1000)}k грн</span></div>
+      <div class="equip-row"><span class="equip-name">👷 Монтажні роботи</span><span class="equip-price">${Math.round(workUAH/1000)}k грн</span></div>
     `;
     document.getElementById('equipment-list').innerHTML = '<div class="equip-title">Склад системи</div>' + equipHtml;
 
-    document.getElementById('total-price').textContent = '$' + total.toLocaleString();
+    document.getElementById('total-price').textContent = '$' + totalUSD.toLocaleString() + ' (~' + Math.round(totalUAH/1000) + 'k грн)';
   }
 
   const _supabase = window.supabase.createClient(
