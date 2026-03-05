@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>СЕС Калькулятор</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;600&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #07090f;
+    --bg2: #0d1117;
+    --card: #131920;
+    --border: rgba(255,200,0,0.12);
+    --gold: #FFB800;
+    --gold2: #FF8C00;
+    --green: #00E676;
+    --text: #E6EDF3;
+    --muted: #556070;
+    --red: #FF5252;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Manrope', sans-serif;
+    min-height: 100vh;
+    padding: 24px 16px;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .header-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    letter-spacing: 4px;
+    background: linear-gradient(135deg, var(--gold), var(--gold2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1;
+  }
+
+  .header-sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 6px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  /* Input section */
+  .input-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px;
+    margin-bottom: 20px;
+  }
+
+  .input-card-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .input-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .input-group.full { grid-column: 1 / -1; }
+
+  label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+  }
+
+  input[type="number"], select {
+    background: var(--bg2);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 14px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+
+  input[type="number"]:focus, select:focus {
+    border-color: var(--gold);
+  }
+
+  select { cursor: pointer; }
+
+  /* Toggle buttons */
+  .toggle-group {
+    display: flex;
+    gap: 8px;
+  }
+
+  .toggle-btn {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    background: var(--bg2);
+    color: var(--muted);
+    font-family: 'Manrope', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+
+  .toggle-btn.active {
+    border-color: var(--gold);
+    background: rgba(255,184,0,0.08);
+    color: var(--gold);
+  }
+
+  /* Calculate button */
+  .calc-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--gold), var(--gold2));
+    border: none;
+    border-radius: 14px;
+    color: #000;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 20px;
+  }
+
+  .calc-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(255,184,0,0.3);
+  }
+
+  /* Result section */
+  .result-section {
+    display: none;
+  }
+
+  .result-section.visible { display: block; }
+
+  /* Summary cards */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .summary-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px 16px;
+    text-align: center;
+  }
+
+  .summary-card.highlight {
+    border-color: rgba(255,184,0,0.3);
+    background: rgba(255,184,0,0.05);
+  }
+
+  .summary-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 6px;
+  }
+
+  .summary-val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 1px;
+    color: var(--gold);
+  }
+
+  .summary-card:not(.highlight) .summary-val { color: var(--text); }
+
+  /* Smeta table */
+  .smeta-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .smeta-header {
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--border);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .smeta-section {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .smeta-section:last-child { border-bottom: none; }
+
+  .smeta-section-title {
+    padding: 12px 22px 8px;
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+    background: rgba(255,255,255,0.02);
+  }
+
+  .smeta-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 22px;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    font-size: 13px;
+  }
+
+  .smeta-row:last-child { border-bottom: none; }
+
+  .smeta-name { color: var(--text); flex: 1; }
+  .smeta-qty { color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 12px; width: 100px; text-align: center; }
+  .smeta-price { color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 12px; width: 100px; text-align: right; }
+  .smeta-sum { color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; width: 110px; text-align: right; }
+
+  .smeta-subtotal {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 22px;
+    background: rgba(255,255,255,0.03);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gold);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .smeta-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 22px;
+    background: rgba(255,184,0,0.06);
+    border-top: 1px solid rgba(255,184,0,0.2);
+  }
+
+  .smeta-total-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 2px;
+    color: var(--gold);
+  }
+
+  .smeta-total-val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: var(--gold);
+  }
+
+  .smeta-total-usd {
+    font-size: 13px;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    margin-top: 2px;
+    text-align: right;
+  }
+
+  /* Copy button */
+  .copy-btn {
+    width: 100%;
+    padding: 14px;
+    background: transparent;
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    color: var(--muted);
+    font-family: 'Manrope', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 10px;
+  }
+
+  .copy-btn:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  /* Prices editor */
+  .prices-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+
+  .prices-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .prices-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 2px;
+    color: var(--muted);
+  }
+
+  .prices-arrow {
+    font-size: 18px;
+    color: var(--muted);
+    transition: transform 0.2s;
+  }
+
+  .prices-arrow.open { transform: rotate(180deg); }
+
+  .prices-body {
+    display: none;
+    margin-top: 20px;
+  }
+
+  .prices-body.open { display: block; }
+
+  .prices-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  @media (max-width: 600px) {
+    .input-grid { grid-template-columns: 1fr; }
+    .summary-grid { grid-template-columns: 1fr 1fr; }
+    .prices-grid { grid-template-columns: 1fr; }
+    .smeta-qty, .smeta-price { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <div class="header-title">☀️ СЕС КАЛЬКУЛЯТОР</div>
+    <div class="header-sub">// розрахунок матеріалів та кошторис</div>
+  </div>
+
+  <!-- Input -->
+  <div class="input-card">
+    <div class="input-card-title">⚙️ ПАРАМЕТРИ СИСТЕМИ</div>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Потужність системи (кВт)</label>
+        <input type="number" id="systemKw" value="10" min="1" max="100" step="0.5" oninput="onInput()">
+      </div>
+      <div class="input-group">
+        <label>Тип даху</label>
+        <select id="roofType" onchange="onInput()">
+          <option value="slope">Схил (стандарт)</option>
+          <option value="flat">Плоский</option>
+          <option value="ground">Наземна установка</option>
+          <option value="canopy">Навіс</option>
+        </select>
+      </div>
+      <div class="input-group full">
+        <label>АКБ (акумулятори)</label>
+        <div class="toggle-group">
+          <div class="toggle-btn" id="akb-no" onclick="setAkb('no')">❌ Без АКБ</div>
+          <div class="toggle-btn active" id="akb-yes" onclick="setAkb('yes')">🔋 З АКБ (×2 кВт)</div>
+          <div class="toggle-btn" id="akb-custom" onclick="setAkb('custom')">✏️ Своя кількість</div>
+        </div>
+      </div>
+      <div class="input-group full" id="akb-custom-group" style="display:none">
+        <label>Кількість АКБ Deye 5кВт (шт)</label>
+        <input type="number" id="akbCount" value="4" min="1" max="50" oninput="onInput()">
+      </div>
+      <div class="input-group full">
+        <label>Назва клієнта (для кошторису)</label>
+        <input type="text" id="clientName" placeholder="Іванов І.І." style="font-family:'Manrope',sans-serif;font-size:14px;padding:11px 14px;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;color:var(--text);outline:none;width:100%" oninput="updateClientName()">
+      </div>
+    </div>
+    <button class="calc-btn" onclick="calculate()">⚡ РОЗРАХУВАТИ</button>
+  </div>
+
+  <!-- Prices editor -->
+  <div class="prices-card">
+    <div class="prices-toggle" onclick="togglePrices()">
+      <div class="prices-title">🔧 РЕДАГУВАТИ ЦІНИ</div>
+      <div class="prices-arrow" id="pricesArrow">▼</div>
+    </div>
+    <div class="prices-body" id="pricesBody">
+      <div class="prices-grid">
+        <div class="input-group">
+          <label>Панель 455Вт (грн/шт)</label>
+          <input type="number" id="p-panel" value="2900" oninput="onInput()">
+        </div>
+        <div class="input-group">
+          <label>Доставка панелей (грн)</label>
+          <input type="number" id="p-delivery" value="3000" oninput="onInput()">
+        </div>
+        <div class="input-group">
+          <label>Інвертор Deye 5кВт (грн)</label>
+          <input type="number" id="p-inv5" value="42500" oninput="onInput()">
+        </div>
+        <div class="input-group">
+          <label>Інвертор Deye 10кВт (грн)</label>
+          <input type="number" id="p-inv10" value="85000" oninput="onInput()">
+        </div>
+        <div class="input-group">
+          <label>АКБ Deye 5кВт (грн/шт)</label>
+          <input type="number" id="p-akb" value="42500" oninput="onInput()">
+        </div>
+        <div class="input-group">
+          <label>Монтаж (грн/кВт)</label>
+          <input type="number" id="p-work" value="3655" oninput="onInput()">
+        </div>
+        <div class="input-group">
+          <label>Профіль (грн/м)</label>
+          <input type="number" id="p-profile" value="130" oninput="onInput()">
+        </div>
+        <div class="input-group">
+          <label>Кабель сонячний (грн/м)</label>
+          <input type="number" id="p-cable" value="50" oninput="onInput()">
+        </div>
+        <div class="input-group">
+          <label>Курс USD (грн)</label>
+          <input type="number" id="p-usd" value="43" oninput="onInput()">
+        </div>
+        <div class="input-group">
+          <label>Ваша маржа (%)</label>
+          <input type="number" id="p-margin" value="0" min="0" max="50" oninput="onInput()">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Result -->
+  <div class="result-section" id="resultSection">
+
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="summary-label">Панелей</div>
+        <div class="summary-val" id="r-panels">—</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">Реальна потужність</div>
+        <div class="summary-val" id="r-kw">—</div>
+      </div>
+      <div class="summary-card highlight">
+        <div class="summary-label">Підсумок</div>
+        <div class="summary-val" id="r-total-short">—</div>
+      </div>
+    </div>
+
+    <div class="smeta-card">
+      <div class="smeta-header">📋 КОШТОРИС <span id="smeta-client" style="color:var(--muted);font-size:14px;font-family:'Manrope',sans-serif;font-weight:500;margin-left:8px"></span></div>
+
+      <!-- Панелі -->
+      <div class="smeta-section">
+        <div class="smeta-section-title">☀️ Сонячні панелі</div>
+        <div id="rows-panels"></div>
+        <div class="smeta-subtotal"><span>Підсумок — панелі</span><span id="sub-panels">—</span></div>
+      </div>
+
+      <!-- Інвертор + АКБ -->
+      <div class="smeta-section">
+        <div class="smeta-section-title">⚡ Обладнання</div>
+        <div id="rows-equipment"></div>
+        <div class="smeta-subtotal"><span>Підсумок — обладнання</span><span id="sub-equipment">—</span></div>
+      </div>
+
+      <!-- Кріплення -->
+      <div class="smeta-section">
+        <div class="smeta-section-title">🔩 Кріплення та кабель</div>
+        <div id="rows-mounting"></div>
+        <div class="smeta-subtotal"><span>Підсумок — кріплення</span><span id="sub-mounting">—</span></div>
+      </div>
+
+      <!-- Роботи -->
+      <div class="smeta-section">
+        <div class="smeta-section-title">👷 Монтажні роботи</div>
+        <div id="rows-work"></div>
+        <div class="smeta-subtotal"><span>Підсумок — роботи</span><span id="sub-work">—</span></div>
+      </div>
+
+      <!-- Total -->
+      <div class="smeta-total">
+        <div>
+          <div class="smeta-total-label">ЗАГАЛЬНА СУМА</div>
+          <div class="smeta-total-usd" id="r-total-usd">—</div>
+        </div>
+        <div style="text-align:right">
+          <div class="smeta-total-val" id="r-total">—</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="copy-btn" onclick="copySmeta()">📋 Скопіювати кошторис для клієнта</button>
+  </div>
+</div>
+
+<script>
+  let akbMode = 'yes';
+
+  function setAkb(mode) {
+    akbMode = mode;
+    ['yes','no','custom'].forEach(m => document.getElementById('akb-'+m).classList.remove('active'));
+    document.getElementById('akb-'+mode).classList.add('active');
+    document.getElementById('akb-custom-group').style.display = mode === 'custom' ? 'block' : 'none';
+    onInput();
+  }
+
+  function onInput() { /* live update placeholder */ }
+
+  function togglePrices() {
+    const body = document.getElementById('pricesBody');
+    const arrow = document.getElementById('pricesArrow');
+    body.classList.toggle('open');
+    arrow.classList.toggle('open');
+  }
+
+  function updateClientName() {
+    const name = document.getElementById('clientName').value;
+    document.getElementById('smeta-client').textContent = name ? `— ${name}` : '';
+  }
+
+  function fmtUAH(n) {
+    return Math.round(n).toLocaleString('uk-UA') + ' грн';
+  }
+
+  function row(name, qty, price, sum) {
+    return `<div class="smeta-row">
+      <span class="smeta-name">${name}</span>
+      <span class="smeta-qty">${qty}</span>
+      <span class="smeta-price">${price}</span>
+      <span class="smeta-sum">${fmtUAH(sum)}</span>
+    </div>`;
+  }
+
+  function calculate() {
+    const kw = parseFloat(document.getElementById('systemKw').value) || 10;
+    const roofType = document.getElementById('roofType').value;
+    const usd = parseFloat(document.getElementById('p-usd').value) || 43;
+    const margin = parseFloat(document.getElementById('p-margin').value) || 0;
+
+    // Prices
+    const pPanel = parseFloat(document.getElementById('p-panel').value) || 2900;
+    const pDelivery = parseFloat(document.getElementById('p-delivery').value) || 3000;
+    const pInv5 = parseFloat(document.getElementById('p-inv5').value) || 42500;
+    const pInv10 = parseFloat(document.getElementById('p-inv10').value) || 85000;
+    const pAkb = parseFloat(document.getElementById('p-akb').value) || 42500;
+    const pWork = parseFloat(document.getElementById('p-work').value) || 3655;
+    const pProfile = parseFloat(document.getElementById('p-profile').value) || 130;
+    const pCable = parseFloat(document.getElementById('p-cable').value) || 50;
+
+    // Panels 455W
+    const panelW = 455;
+    const panels = Math.ceil(kw * 1000 / panelW);
+    const actualKw = parseFloat((panels * panelW / 1000).toFixed(2));
+
+    // --- PANELS ---
+    const panelSum = panels * pPanel;
+    const deliverySum = pDelivery;
+    const subPanels = panelSum + deliverySum;
+
+    // --- EQUIPMENT ---
+    const invKw = actualKw <= 5 ? 5 : actualKw <= 10 ? 10 : actualKw <= 20 ? 20 : 30;
+    const invPrice = invKw <= 5 ? pInv5 : pInv10 * Math.ceil(invKw / 10);
+    const invSum = invPrice;
+
+    let akbCount = 0;
+    let akbSum = 0;
+    if (akbMode === 'yes') {
+      akbCount = Math.ceil(actualKw * 2 / 5);
+      akbSum = akbCount * pAkb;
+    } else if (akbMode === 'custom') {
+      akbCount = parseInt(document.getElementById('akbCount').value) || 0;
+      akbSum = akbCount * pAkb;
+    }
+    const subEquipment = invSum + akbSum;
+
+    // --- MOUNTING (per kW based on 10kW example) ---
+    // Profile: 48m/10kW = 4.8m/kW
+    const profileM = Math.round(actualKw * 4.8);
+    const profileSum = profileM * pProfile;
+
+    // Screws 200mm: 42/10kW = 4.2/kW
+    const screws = Math.round(actualKw * 4.2);
+    const screwsSum = screws * 40;
+
+    // Clamps mid: 40/10kW = 4/kW
+    const clampsMid = Math.round(actualKw * 4);
+    const clampsMidSum = clampsMid * 17;
+
+    // Bolts M8: 40/10kW = 4/kW
+    const bolts = Math.round(actualKw * 4);
+    const boltsSum = bolts * 5;
+
+    // End clamps: 4/10kW = 0.4/kW
+    const clampsEnd = Math.max(4, Math.round(actualKw * 0.4));
+    const clampsEndSum = clampsEnd * 13;
+
+    // Cable: 75m/10kW = 7.5m/kW
+    const cableM = Math.round(actualKw * 7.5);
+    const cableSum = cableM * pCable;
+
+    const subMounting = profileSum + screwsSum + clampsMidSum + boltsSum + clampsEndSum + cableSum;
+
+    // --- WORK ---
+    const workSum = Math.round(actualKw * pWork);
+    const subWork = workSum;
+
+    // --- TOTAL ---
+    const subtotal = subPanels + subEquipment + subMounting + subWork;
+    const total = Math.round(subtotal * (1 + margin / 100));
+    const totalUSD = Math.round(total / usd);
+
+    // --- RENDER ---
+    document.getElementById('r-panels').textContent = panels + ' шт';
+    document.getElementById('r-kw').textContent = actualKw + ' кВт';
+    document.getElementById('r-total-short').textContent = Math.round(total/1000) + 'k грн';
+    document.getElementById('r-total').textContent = fmtUAH(total);
+    document.getElementById('r-total-usd').textContent = '≈ $' + totalUSD.toLocaleString();
+
+    // Panels rows
+    document.getElementById('rows-panels').innerHTML =
+      row(`Панель ${panelW}Вт`, `${panels} шт`, `${pPanel.toLocaleString()} грн`, panelSum) +
+      row('Доставка', '1 разово', `${pDelivery.toLocaleString()} грн`, deliverySum);
+    document.getElementById('sub-panels').textContent = fmtUAH(subPanels);
+
+    // Equipment rows
+    let eqRows = row(`Інвертор Deye ${invKw}кВт гібрид`, '1 шт', `${invPrice.toLocaleString()} грн`, invSum);
+    if (akbCount > 0) {
+      eqRows += row(`АКБ Deye 5кВт·год`, `${akbCount} шт`, `${pAkb.toLocaleString()} грн`, akbSum);
+    }
+    document.getElementById('rows-equipment').innerHTML = eqRows;
+    document.getElementById('sub-equipment').textContent = fmtUAH(subEquipment);
+
+    // Mounting rows
+    document.getElementById('rows-mounting').innerHTML =
+      row('Профіль', `${profileM} м`, `${pProfile} грн/м`, profileSum) +
+      row('Шуруп 200мм', `${screws} шт`, '40 грн', screwsSum) +
+      row('Прижим міжпанельний', `${clampsMid} шт`, '17 грн', clampsMidSum) +
+      row('Болт М8 + гайка', `${bolts} шт`, '5 грн', boltsSum) +
+      row('Прижим крайній', `${clampsEnd} шт`, '13 грн', clampsEndSum) +
+      row('Кабель сонячний', `${cableM} м`, `${pCable} грн/м`, cableSum);
+    document.getElementById('sub-mounting').textContent = fmtUAH(subMounting);
+
+    // Work rows
+    document.getElementById('rows-work').innerHTML =
+      row(`Монтаж СЕС ${actualKw}кВт`, `${actualKw} кВт`, `${pWork.toLocaleString()} грн/кВт`, workSum);
+    document.getElementById('sub-work').textContent = fmtUAH(subWork);
+
+    document.getElementById('resultSection').classList.add('visible');
+    document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    // Store for copy
+    window._smetaData = { panels, actualKw, panelSum, deliverySum, subPanels, invKw, invPrice, invSum, akbCount, pAkb, akbSum, subEquipment, profileM, profileSum, screws, screwsSum, clampsMid, clampsMidSum, bolts, boltsSum, clampsEnd, clampsEndSum, cableM, cableSum, subMounting, workSum, subWork, total, totalUSD, usd, pWork, pProfile, pCable, pPanel, pDelivery };
+  }
+
+  function copySmeta() {
+    const d = window._smetaData;
+    if (!d) return;
+    const client = document.getElementById('clientName').value;
+    const date = new Date().toLocaleDateString('uk-UA');
+
+    let text = `КОШТОРИС НА СЕС ${d.actualKw}кВт`;
+    if (client) text += ` — ${client}`;
+    text += `\n${date}\n`;
+    text += '═'.repeat(45) + '\n';
+    text += `\n☀️ СОНЯЧНІ ПАНЕЛІ\n`;
+    text += `  Панель 455Вт × ${d.panels}шт = ${Math.round(d.panelSum).toLocaleString()} грн\n`;
+    text += `  Доставка = ${d.pDelivery.toLocaleString()} грн\n`;
+    text += `  Підсумок: ${Math.round(d.subPanels).toLocaleString()} грн\n`;
+    text += `\n⚡ ОБЛАДНАННЯ\n`;
+    text += `  Інвертор Deye ${d.invKw}кВт = ${Math.round(d.invPrice).toLocaleString()} грн\n`;
+    if (d.akbCount > 0) text += `  АКБ Deye 5кВт × ${d.akbCount}шт = ${Math.round(d.akbSum).toLocaleString()} грн\n`;
+    text += `  Підсумок: ${Math.round(d.subEquipment).toLocaleString()} грн\n`;
+    text += `\n🔩 КРІПЛЕННЯ ТА КАБЕЛЬ\n`;
+    text += `  Профіль ${d.profileM}м = ${Math.round(d.profileSum).toLocaleString()} грн\n`;
+    text += `  Кріплення = ${Math.round(d.screwsSum + d.clampsMidSum + d.boltsSum + d.clampsEndSum).toLocaleString()} грн\n`;
+    text += `  Кабель ${d.cableM}м = ${Math.round(d.cableSum).toLocaleString()} грн\n`;
+    text += `  Підсумок: ${Math.round(d.subMounting).toLocaleString()} грн\n`;
+    text += `\n👷 МОНТАЖНІ РОБОТИ\n`;
+    text += `  Монтаж ${d.actualKw}кВт = ${Math.round(d.workSum).toLocaleString()} грн\n`;
+    text += '\n' + '═'.repeat(45) + '\n';
+    text += `ЗАГАЛЬНА СУМА: ${Math.round(d.total).toLocaleString()} грн\n`;
+    text += `(≈ $${d.totalUSD.toLocaleString()})\n`;
+
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.querySelector('.copy-btn');
+      btn.textContent = '✅ Скопійовано!';
+      setTimeout(() => btn.textContent = '📋 Скопіювати кошторис для клієнта', 2000);
+    });
+  }
+</script>
+</body>
+</html>
