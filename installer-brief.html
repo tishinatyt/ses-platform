@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Стати партнером — СЕС Монтаж</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0D1117;
+    --bg2: #161B22;
+    --card: #1C2333;
+    --accent: #00D4FF;
+    --accent2: #F5A623;
+    --green: #00E676;
+    --border: rgba(0,212,255,0.15);
+    --text: #E6EDF3;
+    --muted: #7D8590;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Manrope', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Glow */
+  .glow {
+    position: fixed;
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    filter: blur(80px);
+    opacity: 0.12;
+  }
+  .glow-1 { background: var(--accent); top: -100px; right: -100px; }
+  .glow-2 { background: var(--accent2); bottom: -100px; left: -100px; }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 48px 20px 80px;
+  }
+
+  /* Hero */
+  .hero {
+    margin-bottom: 48px;
+    animation: fadeUp 0.7s ease both;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 100px;
+    padding: 6px 14px;
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+
+  .badge::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: blink 1.5s ease-in-out infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(42px, 9vw, 72px);
+    line-height: 0.95;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+
+  h1 span { color: var(--accent); }
+
+  .hero-sub {
+    font-size: 16px;
+    color: var(--muted);
+    line-height: 1.6;
+    max-width: 500px;
+    font-weight: 400;
+  }
+
+  /* Benefits */
+  .benefits {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 40px;
+    animation: fadeUp 0.7s 0.1s ease both;
+  }
+
+  .benefit {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .benefit-icon { font-size: 24px; margin-bottom: 6px; }
+  .benefit-val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    color: var(--accent);
+    letter-spacing: 1px;
+  }
+  .benefit-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* Form sections */
+  .section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px;
+    margin-bottom: 16px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .section:nth-child(1) { animation-delay: 0.15s; }
+  .section:nth-child(2) { animation-delay: 0.25s; }
+  .section:nth-child(3) { animation-delay: 0.35s; }
+  .section:nth-child(4) { animation-delay: 0.45s; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .section-num {
+    width: 32px;
+    height: 32px;
+    background: rgba(0,212,255,0.1);
+    border: 1px solid rgba(0,212,255,0.3);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .section-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .section-desc {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* Fields */
+  .field-grid { display: grid; gap: 14px; }
+  .field-grid-2 { grid-template-columns: 1fr 1fr; }
+
+  .field { display: flex; flex-direction: column; gap: 6px; }
+
+  .field-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-weight: 600;
+  }
+
+  .input {
+    background: var(--bg2);
+    border: 1.5px solid rgba(255,255,255,0.07);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-family: 'Manrope', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.25s ease;
+    width: 100%;
+  }
+
+  .input:focus { border-color: var(--accent); }
+  .input::placeholder { color: var(--muted); }
+
+  select.input {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%237D8590' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 40px;
+  }
+
+  /* Role selector */
+  .role-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 0;
+  }
+
+  .role-btn {
+    background: var(--bg2);
+    border: 1.5px solid rgba(255,255,255,0.07);
+    border-radius: 14px;
+    padding: 20px 16px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-align: left;
+    color: var(--text);
+    font-family: 'Manrope', sans-serif;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .role-btn:hover { border-color: rgba(0,212,255,0.3); }
+
+  .role-btn.selected {
+    border-color: var(--accent);
+    background: rgba(0,212,255,0.06);
+  }
+
+  .role-icon { font-size: 28px; }
+  .role-name { font-size: 15px; font-weight: 600; }
+  .role-desc { font-size: 12px; color: var(--muted); line-height: 1.4; }
+
+  /* Checkboxes — cities */
+  .cities-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .city-cb {
+    display: none;
+  }
+
+  .city-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg2);
+    border: 1.5px solid rgba(255,255,255,0.07);
+    border-radius: 10px;
+    padding: 10px 8px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  .city-cb:checked + .city-label {
+    border-color: var(--accent);
+    background: rgba(0,212,255,0.08);
+    color: var(--accent);
+  }
+
+  /* Experience options */
+  .exp-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+
+  .exp-btn {
+    background: var(--bg2);
+    border: 1.5px solid rgba(255,255,255,0.07);
+    border-radius: 10px;
+    padding: 12px 8px;
+    cursor: pointer;
+    font-family: 'Manrope', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    transition: all 0.2s ease;
+    text-align: center;
+  }
+
+  .exp-btn:hover { border-color: rgba(0,212,255,0.3); }
+  .exp-btn.selected {
+    border-color: var(--accent);
+    background: rgba(0,212,255,0.08);
+    color: var(--accent);
+  }
+
+  /* Slider */
+  .rate-display {
+    text-align: center;
+    margin-bottom: 12px;
+  }
+
+  .rate-val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    color: var(--accent);
+    letter-spacing: 2px;
+  }
+
+  .rate-unit {
+    font-size: 14px;
+    color: var(--muted);
+    font-family: 'Manrope', sans-serif;
+  }
+
+  .slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 5px;
+    border-radius: 3px;
+    outline: none;
+    background: linear-gradient(to right, var(--accent) 0%, var(--accent) var(--val, 40%), rgba(255,255,255,0.1) var(--val, 40%), rgba(255,255,255,0.1) 100%);
+    margin-bottom: 10px;
+  }
+
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    border: 3px solid var(--bg);
+    box-shadow: 0 0 10px rgba(0,212,255,0.5);
+  }
+
+  .slider-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* Textarea */
+  textarea.input {
+    resize: vertical;
+    min-height: 90px;
+    line-height: 1.5;
+  }
+
+  /* Submit */
+  .submit-wrap {
+    margin-top: 24px;
+    animation: fadeUp 0.6s 0.5s ease both;
+  }
+
+  .btn-submit {
+    width: 100%;
+    background: var(--accent);
+    border: none;
+    border-radius: 14px;
+    padding: 18px;
+    color: var(--bg);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-submit::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .btn-submit:hover::before { left: 100%; }
+  .btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(0,212,255,0.35);
+  }
+
+  .submit-note {
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 12px;
+  }
+
+  /* Success */
+  .success {
+    display: none;
+    text-align: center;
+    padding: 48px 24px;
+    background: var(--card);
+    border: 1px solid rgba(0,230,118,0.2);
+    border-radius: 20px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .success.show { display: block; }
+
+  .success-icon { font-size: 56px; margin-bottom: 20px; }
+
+  .success-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    color: var(--green);
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+  }
+
+  .success-text {
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .success-info {
+    background: var(--bg2);
+    border-radius: 12px;
+    padding: 16px 20px;
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.8;
+    text-align: left;
+    display: inline-block;
+  }
+
+  @media (max-width: 520px) {
+    .benefits { grid-template-columns: repeat(3, 1fr); }
+    .field-grid-2 { grid-template-columns: 1fr; }
+    .cities-grid { grid-template-columns: repeat(2, 1fr); }
+    .exp-grid { grid-template-columns: repeat(2, 1fr); }
+    .role-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="glow glow-1"></div>
+<div class="glow glow-2"></div>
+
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="badge">Партнерська програма</div>
+    <h1>СТАТИ<br><span>ПАРТНЕРОМ</span><br>СЕС</h1>
+    <p class="hero-sub">Отримуй замовлення на монтаж сонячних станцій. Ми знаходимо клієнтів — ти встановлюєш.</p>
+  </div>
+
+  <!-- Benefits -->
+  <div class="benefits">
+    <div class="benefit">
+      <div class="benefit-icon">📋</div>
+      <div class="benefit-val">5-10</div>
+      <div class="benefit-label">замовлень/міс</div>
+    </div>
+    <div class="benefit">
+      <div class="benefit-icon">⚡</div>
+      <div class="benefit-val">24 год</div>
+      <div class="benefit-label">до першого об'єкта</div>
+    </div>
+    <div class="benefit">
+      <div class="benefit-icon">🤝</div>
+      <div class="benefit-val">0 грн</div>
+      <div class="benefit-label">вхід безкоштовний</div>
+    </div>
+  </div>
+
+  <div id="formWrap">
+
+    <!-- Section 1: Role -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">1</div>
+        <div>
+          <div class="section-title">Ваша спеціалізація</div>
+          <div class="section-desc">Хто ви за фахом?</div>
+        </div>
+      </div>
+      <div class="role-grid">
+        <button class="role-btn" onclick="selectRole(this, 'installer')">
+          <span class="role-icon">🔧</span>
+          <span class="role-name">Монтажник СЕС</span>
+          <span class="role-desc">Встановлення панелей, кріплення, механіка</span>
+        </button>
+        <button class="role-btn" onclick="selectRole(this, 'electrician')">
+          <span class="role-icon">⚡</span>
+          <span class="role-name">Електрик</span>
+          <span class="role-desc">Підключення, інвертори, захист, заземлення</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Section 2: Personal info -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">2</div>
+        <div>
+          <div class="section-title">Контактна інформація</div>
+          <div class="section-desc">Як з вами зв'язатись?</div>
+        </div>
+      </div>
+      <div class="field-grid field-grid-2">
+        <div class="field">
+          <label class="field-label">Ім'я та прізвище</label>
+          <input class="input" type="text" id="name" placeholder="Іван Петренко">
+        </div>
+        <div class="field">
+          <label class="field-label">Телефон</label>
+          <input class="input" type="tel" id="phone" placeholder="+380 XX XXX XX XX">
+        </div>
+        <div class="field">
+          <label class="field-label">Telegram / Viber</label>
+          <input class="input" type="text" id="messenger" placeholder="@username або номер">
+        </div>
+        <div class="field">
+          <label class="field-label">Місто проживання</label>
+          <input class="input" type="text" id="city" placeholder="Чернігів">
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3: Experience -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">3</div>
+        <div>
+          <div class="section-title">Досвід та кваліфікація</div>
+          <div class="section-desc">Ваш рівень роботи з СЕС</div>
+        </div>
+      </div>
+      <div class="field-grid">
+
+        <div class="field">
+          <label class="field-label">Досвід роботи з СЕС</label>
+          <div class="exp-grid">
+            <button class="exp-btn" onclick="selectExp(this, 'none')">Немає</button>
+            <button class="exp-btn" onclick="selectExp(this, '1')">до 1 року</button>
+            <button class="exp-btn" onclick="selectExp(this, '3')">1–3 роки</button>
+            <button class="exp-btn" onclick="selectExp(this, '5')">3+ років</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Кількість виконаних об'єктів</label>
+          <select class="input" id="objects">
+            <option value="" disabled selected>Оберіть...</option>
+            <option value="0">Ще не було — хочу навчитись</option>
+            <option value="1-5">1–5 об'єктів</option>
+            <option value="5-20">5–20 об'єктів</option>
+            <option value="20+">Більше 20 об'єктів</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Є власний інструмент та авто?</label>
+          <select class="input" id="tools">
+            <option value="" disabled selected>Оберіть...</option>
+            <option value="yes">Так, є все необхідне</option>
+            <option value="partial">Частково</option>
+            <option value="no">Ні, потрібна допомога</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Додаткова інформація (необов'язково)</label>
+          <textarea class="input" id="info" placeholder="Сертифікати, спеціалізація, особливі навички..."></textarea>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Section 4: Work zone & rate -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">4</div>
+        <div>
+          <div class="section-title">Зона роботи та ставка</div>
+          <div class="section-desc">Де працюєте та скільки коштують ваші послуги</div>
+        </div>
+      </div>
+      <div class="field-grid">
+
+        <div class="field">
+          <label class="field-label">Міста / райони роботи</label>
+          <div class="cities-grid">
+            <input type="checkbox" class="city-cb" id="c1" value="Чернігів">
+            <label class="city-label" for="c1">Чернігів</label>
+
+            <input type="checkbox" class="city-cb" id="c2" value="Ніжин">
+            <label class="city-label" for="c2">Ніжин</label>
+
+            <input type="checkbox" class="city-cb" id="c3" value="Прилуки">
+            <label class="city-label" for="c3">Прилуки</label>
+
+            <input type="checkbox" class="city-cb" id="c4" value="Бахмач">
+            <label class="city-label" for="c4">Бахмач</label>
+
+            <input type="checkbox" class="city-cb" id="c5" value="Козелець">
+            <label class="city-label" for="c5">Козелець</label>
+
+            <input type="checkbox" class="city-cb" id="c6" value="Вся область">
+            <label class="city-label" for="c6">Вся область</label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Ваша ставка за монтаж</label>
+          <div class="rate-display">
+            <span class="rate-val" id="rateVal">$50</span>
+            <span class="rate-unit">&nbsp;за кВт встановленої потужності</span>
+          </div>
+          <input type="range" class="slider" id="rateSlider"
+                 min="20" max="150" value="50" step="5"
+                 oninput="updateRate(this)">
+          <div class="slider-labels">
+            <span>$20/кВт</span>
+            <span>$150/кВт</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <div class="submit-wrap">
+      <button class="btn-submit" onclick="submitForm()">НАДІСЛАТИ ЗАЯВКУ →</button>
+      <div class="submit-note">Розглядаємо заявки протягом 24 годин. Зв'яжемось у Telegram/Viber.</div>
+    </div>
+
+  </div>
+
+  <!-- Success -->
+  <div class="success" id="success">
+    <div class="success-icon">🎉</div>
+    <div class="success-title">ЗАЯВКУ ПРИЙНЯТО!</div>
+    <div class="success-text">
+      Ми отримали вашу анкету і зв'яжемось<br>протягом <strong style="color:var(--accent)">24 годин</strong> для уточнення деталей.
+    </div>
+    <div class="success-info" id="successInfo"></div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Facebook Pixel -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '190661670459848');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=190661670459848&ev=PageView&noscript=1"/></noscript>
+
+<script>
+  const _supabase = window.supabase.createClient(
+    'https://ajvgaxevtjsfmtrmmvgr.supabase.co',
+    'sb_publishable_B7SYnCIvMiAVZQ8XIdR5PA_vavrWc4q'
+  );
+
+  async function saveInstaller(installerData) {
+    try {
+      await _supabase.from('installers').insert([installerData]);
+    } catch(e) { console.log('Supabase error:', e); }
+  }
+
+  const formData = { role: null, exp: null, rate: 50 };
+
+  // Init slider
+  window.addEventListener('load', () => {
+    const sl = document.getElementById('rateSlider');
+    const pct = ((sl.value - sl.min) / (sl.max - sl.min)) * 100;
+    sl.style.setProperty('--val', pct + '%');
+  });
+
+  function selectRole(btn, val) {
+    document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    formData.role = val;
+  }
+
+  function selectExp(btn, val) {
+    document.querySelectorAll('.exp-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    formData.exp = val;
+  }
+
+  function updateRate(el) {
+    formData.rate = el.value;
+    document.getElementById('rateVal').textContent = '$' + el.value;
+    const pct = ((el.value - el.min) / (el.max - el.min)) * 100;
+    el.style.setProperty('--val', pct + '%');
+  }
+
+  function getCities() {
+    const checked = document.querySelectorAll('.city-cb:checked');
+    return Array.from(checked).map(c => c.value).join(', ') || 'не вказано';
+  }
+
+  async function sendTelegram(text) {
+    const token = '8741925031:AAHacGEzHZFa3OHe81g1C07tTEBEr-jVaHk';
+    const chatId = '503549265';
+    try {
+      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({chat_id: chatId, text: text})
+      });
+    } catch(e) { console.log('Telegram error:', e); }
+  }
+
+  function submitForm() {
+    const name = document.getElementById('name').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const messenger = document.getElementById('messenger').value.trim();
+    const city = document.getElementById('city').value.trim();
+    const objects = document.getElementById('objects').value;
+    const tools = document.getElementById('tools').value;
+    const info = document.getElementById('info').value.trim();
+
+    if (!name || !phone || !formData.role) {
+      alert('Будь ласка, заповніть обов\'язкові поля: ім\'я, телефон та спеціалізацію');
+      return;
+    }
+
+    const roleLabel = formData.role === 'installer' ? '🔧 Монтажник СЕС' : '⚡ Електрик';
+    const expLabel = {none: 'Немає', '1': 'до 1 року', '3': '1–3 роки', '5': '3+ років'}[formData.exp] || 'не вказано';
+    const cities = getCities();
+
+    const text = `🆕 НОВИЙ ПАРТНЕР!\n\n${roleLabel}\n\n👤 Ім'я: ${name}\n📞 Телефон: ${phone}\n💬 Telegram/Viber: ${messenger || 'не вказано'}\n📍 Місто: ${city}\n\n📊 ДОСВІД:\n• Стаж з СЕС: ${expLabel}\n• Об'єктів виконано: ${objects || 'не вказано'}\n• Інструмент/авто: ${tools || 'не вказано'}\n\n🗺 Зона роботи: ${cities}\n💰 Ставка: $${formData.rate}/кВт\n\n📝 Додатково: ${info || '—'}`;
+
+    sendTelegram(text);
+
+    // Save to Supabase
+    saveInstaller({
+      name, phone, messenger,
+      city, role: formData.role,
+      experience: formData.exp,
+      objects, tools,
+      cities,
+      rate: formData.rate,
+      info,
+      status: 'new'
+    });
+
+    if(typeof fbq !== 'undefined') fbq('track', 'Lead', {content_name: 'Партнер СЕС', content_category: formData.role});
+
+    // Show success
+    document.getElementById('formWrap').style.display = 'none';
+    const s = document.getElementById('success');
+    s.classList.add('show');
+    document.getElementById('successInfo').innerHTML =
+      `👤 ${name}<br>📞 ${phone}<br>${roleLabel}<br>💰 Ставка: $${formData.rate}/кВт<br>🗺 ${cities}`;
+
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }
+</script>
+</body>
+</html>

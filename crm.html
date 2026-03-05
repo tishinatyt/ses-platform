@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>СЕС Платформа — CRM</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --bg: #080C12;
+    --bg2: #0F1521;
+    --card: #141C2A;
+    --card2: #1A2236;
+    --accent: #00D4FF;
+    --green: #00E676;
+    --orange: #F5A623;
+    --red: #FF5252;
+    --purple: #B388FF;
+    --border: rgba(0,212,255,0.1);
+    --text: #E6EDF3;
+    --muted: #6B7A99;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Manrope', sans-serif;
+    min-height: 100vh;
+    display: flex;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    width: 240px;
+    min-height: 100vh;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    padding: 24px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 2px;
+    color: var(--accent);
+  }
+
+  .logo-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .nav {
+    padding: 16px 12px;
+    flex: 1;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    transition: all 0.2s ease;
+    margin-bottom: 4px;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+  }
+
+  .nav-item:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+  .nav-item.active { background: rgba(0,212,255,0.08); color: var(--accent); border: 1px solid rgba(0,212,255,0.15); }
+
+  .nav-icon { font-size: 16px; }
+
+  .nav-badge {
+    margin-left: auto;
+    background: var(--accent);
+    color: var(--bg);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 100px;
+  }
+
+  /* Main */
+  .main {
+    margin-left: 240px;
+    flex: 1;
+    padding: 28px;
+    min-height: 100vh;
+  }
+
+  /* Header */
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+  }
+
+  .page-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    letter-spacing: 1px;
+    color: var(--text);
+  }
+
+  .header-actions { display: flex; gap: 10px; align-items: center; }
+
+  .btn {
+    padding: 9px 18px;
+    border-radius: 10px;
+    font-family: 'Manrope', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+  }
+
+  .btn-primary { background: var(--accent); color: var(--bg); }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,212,255,0.3); }
+  .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+  .btn-ghost:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+
+  /* Stats */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  .stat-card.blue::before { background: var(--accent); }
+  .stat-card.green::before { background: var(--green); }
+  .stat-card.orange::before { background: var(--orange); }
+  .stat-card.purple::before { background: var(--purple); }
+
+  .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
+  .stat-val { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 1px; line-height: 1; }
+  .stat-card.blue .stat-val { color: var(--accent); }
+  .stat-card.green .stat-val { color: var(--green); }
+  .stat-card.orange .stat-val { color: var(--orange); }
+  .stat-card.purple .stat-val { color: var(--purple); }
+  .stat-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  /* Table */
+  .table-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .table-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .table-title { font-size: 15px; font-weight: 600; }
+
+  .search-input {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 14px;
+    color: var(--text);
+    font-family: 'Manrope', sans-serif;
+    font-size: 13px;
+    outline: none;
+    width: 220px;
+  }
+
+  .search-input:focus { border-color: var(--accent); }
+  .search-input::placeholder { color: var(--muted); }
+
+  table { width: 100%; border-collapse: collapse; }
+
+  th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+    background: rgba(255,255,255,0.02);
+  }
+
+  td {
+    padding: 14px 16px;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    vertical-align: middle;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); cursor: pointer; }
+
+  /* Status badges */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; }
+
+  .badge-new { background: rgba(0,212,255,0.1); color: var(--accent); }
+  .badge-new::before { background: var(--accent); }
+
+  .badge-contact { background: rgba(245,166,35,0.1); color: var(--orange); }
+  .badge-contact::before { background: var(--orange); }
+
+  .badge-work { background: rgba(179,136,255,0.1); color: var(--purple); }
+  .badge-work::before { background: var(--purple); }
+
+  .badge-done { background: rgba(0,230,118,0.1); color: var(--green); }
+  .badge-done::before { background: var(--green); }
+
+  .badge-cancel { background: rgba(255,82,82,0.1); color: var(--red); }
+  .badge-cancel::before { background: var(--red); }
+
+  /* Empty state */
+  .empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+  }
+  .empty-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-text { font-size: 14px; }
+
+  /* Loading */
+  .loading-row td { text-align: center; padding: 40px; color: var(--muted); }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px;
+    width: 100%;
+    max-width: 560px;
+    max-height: 80vh;
+    overflow-y: auto;
+    animation: modalIn 0.25s ease;
+  }
+
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.96) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+
+  .modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 1px; }
+
+  .modal-close {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px;
+  }
+
+  .modal-close:hover { color: var(--text); }
+
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+
+  .detail-item { background: var(--bg2); border-radius: 10px; padding: 14px; }
+  .detail-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; }
+  .detail-val { font-size: 14px; font-weight: 500; }
+
+  .status-select {
+    width: 100%;
+    background: var(--bg2);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: 'Manrope', sans-serif;
+    font-size: 13px;
+    outline: none;
+    margin-bottom: 14px;
+    cursor: pointer;
+  }
+
+  .status-select:focus { border-color: var(--accent); }
+
+  .installer-select {
+    width: 100%;
+    background: var(--bg2);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: 'Manrope', sans-serif;
+    font-size: 13px;
+    outline: none;
+    margin-bottom: 14px;
+    cursor: pointer;
+    appearance: none;
+  }
+
+  .form-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; display: block; }
+
+  .notes-input {
+    width: 100%;
+    background: var(--bg2);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: 'Manrope', sans-serif;
+    font-size: 13px;
+    outline: none;
+    resize: vertical;
+    min-height: 80px;
+    margin-bottom: 14px;
+  }
+
+  .notes-input:focus { border-color: var(--accent); }
+
+  /* Page sections */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* Installers grid */
+  .installers-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  .installer-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .installer-card:hover {
+    border-color: rgba(0,212,255,0.3);
+    transform: translateY(-2px);
+  }
+
+  .installer-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(0,212,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-bottom: 12px;
+  }
+
+  .installer-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .installer-role { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+  .installer-meta { font-size: 12px; color: var(--muted); line-height: 1.8; }
+  .installer-rate { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--orange); margin-top: 10px; }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--bg2);
+    border-radius: 10px;
+    padding: 4px;
+    margin-bottom: 20px;
+    width: fit-content;
+  }
+
+  .tab {
+    padding: 8px 16px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--muted);
+    transition: all 0.2s ease;
+    border: none;
+    background: none;
+  }
+
+  .tab.active { background: var(--card2); color: var(--text); }
+
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; padding: 16px; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .installers-grid { grid-template-columns: 1fr 1fr; }
+    .detail-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <div class="logo">
+    <div class="logo-title">☀️ СЕС CRM</div>
+    <div class="logo-sub">Панель управління</div>
+  </div>
+  <nav class="nav">
+    <button class="nav-item active" onclick="showPage('leads')">
+      <span class="nav-icon">📋</span> Заявки
+      <span class="nav-badge" id="newCount">0</span>
+    </button>
+    <button class="nav-item" onclick="showPage('installers')">
+      <span class="nav-icon">👷</span> Монтажники
+    </button>
+    <button class="nav-item" onclick="showPage('stats')">
+      <span class="nav-icon">📊</span> Статистика
+    </button>
+  </nav>
+</div>
+
+<!-- Main -->
+<div class="main">
+
+  <!-- LEADS PAGE -->
+  <div class="page active" id="page-leads">
+    <div class="page-header">
+      <div class="page-title">ЗАЯВКИ КЛІЄНТІВ</div>
+      <div class="header-actions">
+        <button class="btn btn-ghost" onclick="loadLeads()">🔄 Оновити</button>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat-card blue">
+        <div class="stat-label">Всього заявок</div>
+        <div class="stat-val" id="stat-total">—</div>
+        <div class="stat-sub">за весь час</div>
+      </div>
+      <div class="stat-card orange">
+        <div class="stat-label">Нові</div>
+        <div class="stat-val" id="stat-new">—</div>
+        <div class="stat-sub">потребують обробки</div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-label">В роботі</div>
+        <div class="stat-val" id="stat-work">—</div>
+        <div class="stat-sub">активні проекти</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-label">Завершено</div>
+        <div class="stat-val" id="stat-done">—</div>
+        <div class="stat-sub">успішно</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" onclick="filterLeads('all', this)">Всі</button>
+      <button class="tab" onclick="filterLeads('new', this)">Нові</button>
+      <button class="tab" onclick="filterLeads('contact', this)">Контакт</button>
+      <button class="tab" onclick="filterLeads('work', this)">В роботі</button>
+      <button class="tab" onclick="filterLeads('done', this)">Завершено</button>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <div class="table-header">
+        <div class="table-title">Список заявок</div>
+        <input class="search-input" type="text" placeholder="🔍 Пошук..." oninput="searchLeads(this.value)">
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Клієнт</th>
+            <th>Телефон</th>
+            <th>Місто</th>
+            <th>Об'єкт</th>
+            <th>Сума</th>
+            <th>Монтажник</th>
+            <th>Статус</th>
+            <th>Дата</th>
+          </tr>
+        </thead>
+        <tbody id="leadsTable">
+          <tr class="loading-row"><td colspan="8">⏳ Завантаження...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- INSTALLERS PAGE -->
+  <div class="page" id="page-installers">
+    <div class="page-header">
+      <div class="page-title">МОНТАЖНИКИ</div>
+      <button class="btn btn-ghost" onclick="loadInstallers()">🔄 Оновити</button>
+    </div>
+    <div class="installers-grid" id="installersGrid">
+      <div style="color:var(--muted);padding:40px;grid-column:1/-1;text-align:center">⏳ Завантаження...</div>
+    </div>
+  </div>
+
+  <!-- STATS PAGE -->
+  <div class="page" id="page-stats">
+    <div class="page-header">
+      <div class="page-title">СТАТИСТИКА</div>
+    </div>
+    <div class="stats" style="grid-template-columns: repeat(2,1fr); max-width: 600px;">
+      <div class="stat-card blue">
+        <div class="stat-label">Загальна сума угод</div>
+        <div class="stat-val" id="stat-revenue">—</div>
+        <div class="stat-sub">за всі заявки</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-label">Конверсія</div>
+        <div class="stat-val" id="stat-conv">—</div>
+        <div class="stat-sub">заявки → завершено</div>
+      </div>
+      <div class="stat-card orange">
+        <div class="stat-label">Монтажників</div>
+        <div class="stat-val" id="stat-installers">—</div>
+        <div class="stat-sub">в базі</div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-label">Середній чек</div>
+        <div class="stat-val" id="stat-avg">—</div>
+        <div class="stat-sub">по завершеним</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Lead Modal -->
+<div class="modal-overlay" id="leadModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">ЗАЯВКА</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script>
+  const SUPABASE_URL = 'https://ajvgaxevtjsfmtrmmvgr.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_B7SYnCIvMiAVZQ8XIdR5PA_vavrWc4q';
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  let allLeads = [];
+  let allInstallers = [];
+  let currentFilter = 'all';
+
+  const statusLabels = {
+    new: 'Новий',
+    contact: 'Контакт',
+    work: 'В роботі',
+    done: 'Завершено',
+    cancel: 'Скасовано'
+  };
+
+  const objLabels = {
+    house: '🏠 Будинок',
+    business: '🏭 Бізнес'
+  };
+
+  // Navigation
+  function showPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+    event.currentTarget.classList.add('active');
+    if (name === 'installers') loadInstallers();
+    if (name === 'stats') loadStats();
+  }
+
+  // Load leads
+  async function loadLeads() {
+    const { data, error } = await supabase
+      .from('leads')
+      .select('*, installers(name)')
+      .order('created_at', { ascending: false });
+
+    if (error) { console.error(error); return; }
+    allLeads = data || [];
+    renderLeads(allLeads);
+    updateStats();
+  }
+
+  function renderLeads(leads) {
+    const tbody = document.getElementById('leadsTable');
+    if (!leads.length) {
+      tbody.innerHTML = `<tr><td colspan="8"><div class="empty"><div class="empty-icon">📭</div><div class="empty-text">Заявок поки немає</div></div></td></tr>`;
+      return;
+    }
+    tbody.innerHTML = leads.map(l => `
+      <tr onclick="openLead('${l.id}')">
+        <td><strong>${l.name || '—'}</strong></td>
+        <td>${l.phone || '—'}</td>
+        <td>${l.city || '—'}</td>
+        <td>${objLabels[l.obj_type] || l.obj_type || '—'}</td>
+        <td style="color:var(--orange);font-weight:600">${l.total || '—'}</td>
+        <td>${l.installers?.name || '<span style="color:var(--muted)">Не призначено</span>'}</td>
+        <td>${badgeHtml(l.status)}</td>
+        <td style="color:var(--muted)">${formatDate(l.created_at)}</td>
+      </tr>
+    `).join('');
+  }
+
+  function badgeHtml(status) {
+    const cls = { new: 'badge-new', contact: 'badge-contact', work: 'badge-work', done: 'badge-done', cancel: 'badge-cancel' };
+    return `<span class="badge ${cls[status] || 'badge-new'}">${statusLabels[status] || status}</span>`;
+  }
+
+  function formatDate(dt) {
+    if (!dt) return '—';
+    const d = new Date(dt);
+    return d.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit', year: '2-digit' });
+  }
+
+  function updateStats() {
+    document.getElementById('stat-total').textContent = allLeads.length;
+    document.getElementById('stat-new').textContent = allLeads.filter(l => l.status === 'new').length;
+    document.getElementById('stat-work').textContent = allLeads.filter(l => l.status === 'work').length;
+    document.getElementById('stat-done').textContent = allLeads.filter(l => l.status === 'done').length;
+    document.getElementById('newCount').textContent = allLeads.filter(l => l.status === 'new').length;
+  }
+
+  function filterLeads(status, btn) {
+    currentFilter = status;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    const filtered = status === 'all' ? allLeads : allLeads.filter(l => l.status === status);
+    renderLeads(filtered);
+  }
+
+  function searchLeads(q) {
+    const filtered = allLeads.filter(l =>
+      (l.name || '').toLowerCase().includes(q.toLowerCase()) ||
+      (l.phone || '').includes(q) ||
+      (l.city || '').toLowerCase().includes(q.toLowerCase())
+    );
+    renderLeads(filtered);
+  }
+
+  // Open lead modal
+  async function openLead(id) {
+    const lead = allLeads.find(l => l.id === id);
+    if (!lead) return;
+
+    document.getElementById('modalTitle').textContent = `ЗАЯВКА — ${lead.name || ''}`;
+
+    const installersOptions = allInstallers.map(i =>
+      `<option value="${i.id}" ${lead.installer_id === i.id ? 'selected' : ''}>${i.name} (${i.role === 'installer' ? 'Монтажник' : 'Електрик'})</option>`
+    ).join('');
+
+    document.getElementById('modalContent').innerHTML = `
+      <div class="detail-grid">
+        <div class="detail-item">
+          <div class="detail-label">Ім'я</div>
+          <div class="detail-val">${lead.name || '—'}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Телефон</div>
+          <div class="detail-val"><a href="tel:${lead.phone}" style="color:var(--accent)">${lead.phone || '—'}</a></div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Місто</div>
+          <div class="detail-val">${lead.city || '—'}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Об'єкт</div>
+          <div class="detail-val">${objLabels[lead.obj_type] || lead.obj_type || '—'}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Споживання</div>
+          <div class="detail-val">${lead.kwh || '—'} кВт·год/міс</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Акумулятор</div>
+          <div class="detail-val">${lead.battery === 'yes' ? '✅ Так' : '❌ Ні'}</div>
+        </div>
+        <div class="detail-item" style="grid-column:1/-1">
+          <div class="detail-label">Розрахункова сума</div>
+          <div class="detail-val" style="color:var(--orange);font-size:20px;font-family:'Bebas Neue';letter-spacing:1px">${lead.total || '—'}</div>
+        </div>
+      </div>
+
+      <label class="form-label">Статус заявки</label>
+      <select class="status-select" id="modalStatus">
+        <option value="new" ${lead.status==='new'?'selected':''}>🔵 Новий</option>
+        <option value="contact" ${lead.status==='contact'?'selected':''}>🟡 Контакт встановлено</option>
+        <option value="work" ${lead.status==='work'?'selected':''}>🟣 В роботі</option>
+        <option value="done" ${lead.status==='done'?'selected':''}>🟢 Завершено</option>
+        <option value="cancel" ${lead.status==='cancel'?'selected':''}>🔴 Скасовано</option>
+      </select>
+
+      <label class="form-label">Призначити монтажника</label>
+      <select class="installer-select" id="modalInstaller">
+        <option value="">— Не призначено —</option>
+        ${installersOptions}
+      </select>
+
+      <label class="form-label">Нотатки</label>
+      <textarea class="notes-input" id="modalNotes" placeholder="Додаткова інформація...">${lead.notes || ''}</textarea>
+
+      <button class="btn btn-primary" style="width:100%" onclick="saveLead('${lead.id}')">💾 ЗБЕРЕГТИ ЗМІНИ</button>
+    `;
+
+    document.getElementById('leadModal').classList.add('open');
+  }
+
+  async function saveLead(id) {
+    const status = document.getElementById('modalStatus').value;
+    const installer_id = document.getElementById('modalInstaller').value || null;
+    const notes = document.getElementById('modalNotes').value;
+
+    const { error } = await supabase
+      .from('leads')
+      .update({ status, installer_id, notes })
+      .eq('id', id);
+
+    if (error) { alert('Помилка збереження'); return; }
+    closeModal();
+    loadLeads();
+  }
+
+  function closeModal() {
+    document.getElementById('leadModal').classList.remove('open');
+  }
+
+  // Load installers
+  async function loadInstallers() {
+    const { data, error } = await supabase
+      .from('installers')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) { console.error(error); return; }
+    allInstallers = data || [];
+    renderInstallers(allInstallers);
+  }
+
+  function renderInstallers(installers) {
+    const grid = document.getElementById('installersGrid');
+    if (!installers.length) {
+      grid.innerHTML = `<div style="color:var(--muted);padding:60px;grid-column:1/-1;text-align:center"><div style="font-size:40px;margin-bottom:12px">👷</div>Монтажників поки немає</div>`;
+      return;
+    }
+    grid.innerHTML = installers.map(i => `
+      <div class="installer-card">
+        <div class="installer-avatar">${i.role === 'electrician' ? '⚡' : '🔧'}</div>
+        <div class="installer-name">${i.name || '—'}</div>
+        <div class="installer-role">${i.role === 'electrician' ? 'Електрик' : 'Монтажник СЕС'}</div>
+        <div class="installer-meta">
+          📞 ${i.phone || '—'}<br>
+          📍 ${i.city || '—'}<br>
+          🗺 ${i.cities || '—'}<br>
+          📋 Об'єктів: ${i.objects || '—'}
+        </div>
+        <div class="installer-rate">$${i.rate || '—'}/кВт</div>
+      </div>
+    `).join('');
+  }
+
+  // Stats page
+  async function loadStats() {
+    const { data: leads } = await supabase.from('leads').select('status, total');
+    const { data: installers } = await supabase.from('installers').select('id');
+
+    const total = leads?.length || 0;
+    const done = leads?.filter(l => l.status === 'done').length || 0;
+    const conv = total ? Math.round(done / total * 100) : 0;
+
+    const doneLeads = leads?.filter(l => l.status === 'done' && l.total) || [];
+    const revenue = doneLeads.reduce((sum, l) => {
+      const num = parseInt((l.total || '').replace(/[^0-9]/g, ''));
+      return sum + (isNaN(num) ? 0 : num);
+    }, 0);
+    const avg = doneLeads.length ? Math.round(revenue / doneLeads.length) : 0;
+
+    document.getElementById('stat-revenue').textContent = revenue ? '$' + revenue.toLocaleString() : '—';
+    document.getElementById('stat-conv').textContent = conv + '%';
+    document.getElementById('stat-installers').textContent = installers?.length || 0;
+    document.getElementById('stat-avg').textContent = avg ? '$' + avg.toLocaleString() : '—';
+  }
+
+  // Close modal on overlay click
+  document.getElementById('leadModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  // Init
+  loadLeads();
+  loadInstallers();
+</script>
+</body>
+</html>

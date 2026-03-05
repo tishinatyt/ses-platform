@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>СЕС Калькулятор — Бриф</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;600;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sun: #F5A623;
+    --sun-deep: #E07B00;
+    --dark: #0A0E1A;
+    --dark2: #111827;
+    --card: #161D2E;
+    --border: rgba(245,166,35,0.2);
+    --text: #E8EAF0;
+    --muted: #6B7280;
+    --green: #10B981;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated background */
+  .bg-glow {
+    position: fixed;
+    top: -200px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(245,166,35,0.12) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+    animation: pulse 4s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.6; transform: translateX(-50%) scale(1); }
+    50% { opacity: 1; transform: translateX(-50%) scale(1.1); }
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 40px 20px 80px;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 50px;
+    animation: fadeDown 0.8s ease both;
+  }
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .sun-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 20px;
+    position: relative;
+  }
+
+  .sun-icon svg {
+    width: 100%;
+    height: 100%;
+    animation: spin 20s linear infinite;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  h1 {
+    font-family: 'Unbounded', sans-serif;
+    font-size: clamp(22px, 5vw, 34px);
+    font-weight: 800;
+    background: linear-gradient(135deg, #F5A623 0%, #FFD700 50%, #F5A623 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+    margin-bottom: 12px;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 15px;
+    font-weight: 300;
+    letter-spacing: 0.3px;
+  }
+
+  /* Steps */
+  .steps-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 40px;
+    animation: fadeDown 0.8s 0.2s ease both;
+  }
+
+  .step-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: var(--card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    transition: all 0.4s ease;
+    position: relative;
+    z-index: 1;
+  }
+
+  .step-dot.active {
+    border-color: var(--sun);
+    background: var(--sun);
+    color: var(--dark);
+  }
+
+  .step-dot.done {
+    border-color: var(--green);
+    background: var(--green);
+    color: white;
+  }
+
+  .step-line {
+    width: 60px;
+    height: 2px;
+    background: var(--border);
+    transition: background 0.4s ease;
+  }
+
+  .step-line.done { background: var(--green); }
+
+  /* Cards */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px;
+    margin-bottom: 20px;
+    animation: fadeUp 0.6s ease both;
+    display: none;
+  }
+
+  .card.active { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--sun);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+  }
+
+  .card-question {
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 24px;
+    line-height: 1.4;
+  }
+
+  /* Input styles */
+  .input-field {
+    width: 100%;
+    background: var(--dark2);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.3s ease;
+    appearance: none;
+  }
+
+  .input-field:focus {
+    border-color: var(--sun);
+  }
+
+  .input-field::placeholder { color: var(--muted); }
+
+  select.input-field {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236B7280' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 44px;
+  }
+
+  /* Option buttons */
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .options-grid.single { grid-template-columns: 1fr; }
+
+  .opt-btn {
+    background: var(--dark2);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 18px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-align: left;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .opt-btn:hover {
+    border-color: rgba(245,166,35,0.5);
+    background: rgba(245,166,35,0.05);
+  }
+
+  .opt-btn.selected {
+    border-color: var(--sun);
+    background: rgba(245,166,35,0.08);
+    color: var(--sun);
+  }
+
+  .opt-icon {
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+
+  .opt-text { line-height: 1.3; }
+  .opt-label { font-weight: 500; }
+  .opt-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* Slider */
+  .slider-wrap { padding: 8px 0; }
+
+  .slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--dark2);
+    outline: none;
+    margin-bottom: 16px;
+    background: linear-gradient(to right, var(--sun) 0%, var(--sun) var(--val, 30%), var(--dark2) var(--val, 30%), var(--dark2) 100%);
+  }
+
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--sun);
+    cursor: pointer;
+    border: 3px solid var(--dark);
+    box-shadow: 0 0 12px rgba(245,166,35,0.5);
+  }
+
+  .slider-labels {
+    display: flex;
+    justify-content: space-between;
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .slider-value {
+    text-align: center;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--sun);
+    margin-bottom: 8px;
+  }
+
+  .slider-unit {
+    font-size: 14px;
+    color: var(--muted);
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+  }
+
+  /* Navigation */
+  .nav {
+    display: flex;
+    gap: 12px;
+    margin-top: 28px;
+  }
+
+  .btn-back {
+    flex: 0 0 auto;
+    background: transparent;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 24px;
+    color: var(--muted);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+
+  .btn-back:hover {
+    border-color: var(--muted);
+    color: var(--text);
+  }
+
+  .btn-next {
+    flex: 1;
+    background: linear-gradient(135deg, var(--sun), var(--sun-deep));
+    border: none;
+    border-radius: 12px;
+    padding: 14px 28px;
+    color: var(--dark);
+    font-family: 'Unbounded', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    letter-spacing: 0.5px;
+  }
+
+  .btn-next:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(245,166,35,0.35);
+  }
+
+  .btn-next:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  /* Result */
+  .result-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px;
+    display: none;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .result-card.active { display: block; }
+
+  .result-header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .result-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--sun);
+    margin-bottom: 8px;
+  }
+
+  .result-sub {
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .result-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .result-item {
+    background: var(--dark2);
+    border-radius: 14px;
+    padding: 18px;
+    border: 1px solid var(--border);
+  }
+
+  .result-item-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+
+  .result-item-value {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .result-item-value.highlight { color: var(--sun); }
+
+  .equipment-list {
+    background: var(--dark2);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border);
+  }
+
+  .equip-title {
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+  }
+
+  .equip-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 14px;
+  }
+
+  .equip-row:last-child { border-bottom: none; }
+  .equip-name { color: var(--text); }
+  .equip-price { color: var(--sun); font-weight: 500; }
+
+  .total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px;
+    background: rgba(245,166,35,0.08);
+    border: 1px solid var(--sun);
+    border-radius: 14px;
+    margin-bottom: 20px;
+  }
+
+  .total-label {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .total-value {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--sun);
+  }
+
+  .cta-block {
+    text-align: center;
+  }
+
+  .btn-cta {
+    width: 100%;
+    background: linear-gradient(135deg, var(--sun), var(--sun-deep));
+    border: none;
+    border-radius: 14px;
+    padding: 18px;
+    color: var(--dark);
+    font-family: 'Unbounded', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    margin-bottom: 12px;
+  }
+
+  .btn-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(245,166,35,0.4);
+  }
+
+  .cta-note {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* Loading */
+  .loading {
+    text-align: center;
+    padding: 40px;
+    display: none;
+  }
+
+  .loading.active { display: block; }
+
+  .loader {
+    width: 50px;
+    height: 50px;
+    margin: 0 auto 20px;
+    border: 3px solid var(--border);
+    border-top-color: var(--sun);
+    border-radius: 50%;
+    animation: rotate 0.8s linear infinite;
+  }
+
+  @keyframes rotate {
+    to { transform: rotate(360deg); }
+  }
+
+  .loading-text {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 13px;
+    color: var(--muted);
+    animation: blink 1.5s ease-in-out infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+
+  /* Contact form */
+  .contact-form { display: grid; gap: 14px; }
+
+  .input-label {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 6px;
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+
+  /* Hint */
+  .hint {
+    background: rgba(245,166,35,0.06);
+    border: 1px solid rgba(245,166,35,0.15);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 16px;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 480px) {
+    .options-grid { grid-template-columns: 1fr; }
+    .result-grid { grid-template-columns: 1fr; }
+    .card { padding: 24px 20px; }
+  }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Facebook Pixel -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '190661670459848');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=190661670459848&ev=PageView&noscript=1"/></noscript>
+<!-- End Facebook Pixel -->
+</head>
+<body>
+
+<div class="bg-glow"></div>
+
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="sun-icon">
+      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="32" cy="32" r="14" fill="#F5A623" opacity="0.9"/>
+        <circle cx="32" cy="32" r="10" fill="#FFD700"/>
+        <rect x="30" y="4" width="4" height="10" rx="2" fill="#F5A623" opacity="0.7"/>
+        <rect x="30" y="50" width="4" height="10" rx="2" fill="#F5A623" opacity="0.7"/>
+        <rect x="4" y="30" width="10" height="4" rx="2" fill="#F5A623" opacity="0.7"/>
+        <rect x="50" y="30" width="10" height="4" rx="2" fill="#F5A623" opacity="0.7"/>
+        <rect x="12.5" y="10" width="4" height="10" rx="2" fill="#F5A623" opacity="0.5" transform="rotate(45 14.5 15)"/>
+        <rect x="47.5" y="10" width="4" height="10" rx="2" fill="#F5A623" opacity="0.5" transform="rotate(-45 49.5 15)"/>
+        <rect x="12.5" y="44" width="4" height="10" rx="2" fill="#F5A623" opacity="0.5" transform="rotate(-45 14.5 49)"/>
+        <rect x="47.5" y="44" width="4" height="10" rx="2" fill="#F5A623" opacity="0.5" transform="rotate(45 49.5 49)"/>
+      </svg>
+    </div>
+    <h1>Розрахунок СЕС</h1>
+    <p class="subtitle">Заповни бриф — отримай точний розрахунок</p>
+  </div>
+
+  <!-- Steps -->
+  <div class="steps-bar" id="stepsBar">
+    <div class="step-dot active" id="dot1">1</div>
+    <div class="step-line" id="line1"></div>
+    <div class="step-dot" id="dot2">2</div>
+    <div class="step-line" id="line2"></div>
+    <div class="step-dot" id="dot3">3</div>
+    <div class="step-line" id="line3"></div>
+    <div class="step-dot" id="dot4">4</div>
+  </div>
+
+  <!-- Step 1: Object type -->
+  <div class="card active" id="step1">
+    <div class="card-title">Крок 1 з 4</div>
+    <div class="card-question">Що плануєте оснастити сонячними панелями?</div>
+    <div class="options-grid">
+      <button class="opt-btn" onclick="selectOption(this, 'objType', 'house')">
+        <span class="opt-icon">🏠</span>
+        <span class="opt-text">
+          <div class="opt-label">Приватний будинок</div>
+          <div class="opt-desc">Котедж, дача, садиба</div>
+        </span>
+      </button>
+      <button class="opt-btn" onclick="selectOption(this, 'objType', 'business')">
+        <span class="opt-icon">🏭</span>
+        <span class="opt-text">
+          <div class="opt-label">Бізнес / підприємство</div>
+          <div class="opt-desc">Офіс, склад, виробництво</div>
+        </span>
+      </button>
+    </div>
+    <div class="nav">
+      <button class="btn-next" id="next1" onclick="goNext(1)" disabled>ДАЛІ →</button>
+    </div>
+  </div>
+
+  <!-- Step 2: Consumption -->
+  <div class="card" id="step2">
+    <div class="card-title">Крок 2 з 4</div>
+    <div class="card-question">Скільки електроенергії споживаєте на місяць?</div>
+    <div class="slider-wrap">
+      <div class="slider-value"><span id="kwh-val">300</span> <span class="slider-unit">кВт·год/міс</span></div>
+      <input type="range" class="slider" id="kwhSlider" min="100" max="2000" value="300" step="50"
+             oninput="updateSlider(this, 'kwh-val', '')">
+      <div class="slider-labels">
+        <span>100 кВт·год</span>
+        <span>2000 кВт·год</span>
+      </div>
+    </div>
+    <div class="hint">
+      💡 Середній будинок споживає 200–400 кВт·год/міс. Подивись у квитанції за електроенергію.
+    </div>
+    <div class="nav">
+      <button class="btn-back" onclick="goBack(2)">← Назад</button>
+      <button class="btn-next" onclick="goNext(2)">ДАЛІ →</button>
+    </div>
+  </div>
+
+  <!-- Step 3: Roof & battery -->
+  <div class="card" id="step3">
+    <div class="card-title">Крок 3 з 4</div>
+    <div class="card-question">Тип даху та акумулятор</div>
+
+    <div style="margin-bottom:20px">
+      <div class="card-title" style="margin-bottom:10px">Тип покрівлі</div>
+      <div class="options-grid">
+        <button class="opt-btn" onclick="selectOption(this, 'roofType', 'tilt')">
+          <span class="opt-icon">🏠</span>
+          <span class="opt-text"><div class="opt-label">Скатний дах</div></span>
+        </button>
+        <button class="opt-btn" onclick="selectOption(this, 'roofType', 'flat')">
+          <span class="opt-icon">🏢</span>
+          <span class="opt-text"><div class="opt-label">Плоский дах</div></span>
+        </button>
+        <button class="opt-btn" onclick="selectOption(this, 'roofType', 'ground')">
+          <span class="opt-icon">🌿</span>
+          <span class="opt-text"><div class="opt-label">Наземна установка</div></span>
+        </button>
+      </div>
+    </div>
+
+    <div>
+      <div class="card-title" style="margin-bottom:10px">Акумулятор</div>
+      <div class="options-grid">
+        <button class="opt-btn" onclick="selectOption(this, 'battery', 'yes')">
+          <span class="opt-icon">🔋</span>
+          <span class="opt-text">
+            <div class="opt-label">Потрібен</div>
+            <div class="opt-desc">Резерв при відключенні</div>
+          </span>
+        </button>
+        <button class="opt-btn" onclick="selectOption(this, 'battery', 'no')">
+          <span class="opt-icon">⚡</span>
+          <span class="opt-text">
+            <div class="opt-label">Без акумулятора</div>
+            <div class="opt-desc">Тільки мережа</div>
+          </span>
+        </button>
+      </div>
+    </div>
+
+    <div class="nav">
+      <button class="btn-back" onclick="goBack(3)">← Назад</button>
+      <button class="btn-next" id="next3" onclick="goNext(3)" disabled>ДАЛІ →</button>
+    </div>
+  </div>
+
+  <!-- Step 4: Contacts -->
+  <div class="card" id="step4">
+    <div class="card-title">Крок 4 з 4</div>
+    <div class="card-question">Куди надіслати розрахунок?</div>
+    <div class="contact-form">
+      <div>
+        <label class="input-label">Ваше ім'я</label>
+        <input class="input-field" type="text" id="clientName" placeholder="Олександр" oninput="checkContacts()">
+      </div>
+      <div>
+        <label class="input-label">Телефон</label>
+        <input class="input-field" type="tel" id="clientPhone" placeholder="+380 XX XXX XX XX" oninput="checkContacts()">
+      </div>
+      <div>
+        <label class="input-label">Місто / Район</label>
+        <input class="input-field" type="text" id="clientCity" placeholder="Чернігів" oninput="checkContacts()">
+      </div>
+    </div>
+    <div class="nav">
+      <button class="btn-back" onclick="goBack(4)">← Назад</button>
+      <button class="btn-next" id="next4" onclick="calculate()" disabled>РОЗРАХУВАТИ ⚡</button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" id="loading">
+    <div class="loader"></div>
+    <div class="loading-text">ШІ розраховує вашу систему...</div>
+  </div>
+
+  <!-- Result -->
+  <div class="result-card" id="result">
+    <div class="result-header">
+      <div style="font-size:40px;margin-bottom:12px">☀️</div>
+      <div class="result-title">Ваш розрахунок готовий!</div>
+      <div class="result-sub" id="result-sub">Персональна рекомендація для вашого об'єкта</div>
+    </div>
+
+    <div class="result-grid" id="result-grid">
+      <!-- filled by JS -->
+    </div>
+
+    <div class="equipment-list" id="equipment-list">
+      <div class="equip-title">Склад системи</div>
+      <!-- filled by JS -->
+    </div>
+
+    <div class="total-row">
+      <div class="total-label">ЗАГАЛЬНА СУМА</div>
+      <div class="total-value" id="total-price">—</div>
+    </div>
+
+    <div class="cta-block">
+      <button class="btn-cta" onclick="showSuccess()">📞 ЗАМОВИТИ БЕЗКОШТОВНИЙ ВИЇЗД</button>
+      <div class="cta-note">Менеджер зв'яжеться з вами протягом 30 хвилин</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const data = {
+    objType: null,
+    roofType: null,
+    battery: null,
+    kwh: 300
+  };
+
+  function selectOption(btn, field, value) {
+    // Clear siblings in same group
+    const parent = btn.closest('.options-grid');
+    parent.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    data[field] = value;
+
+    // Check if step can proceed
+    if (field === 'objType') {
+      document.getElementById('next1').disabled = false;
+    }
+    if (field === 'roofType' || field === 'battery') {
+      if (data.roofType && data.battery) {
+        document.getElementById('next3').disabled = false;
+      }
+    }
+  }
+
+  function updateSlider(el, displayId, unit) {
+    const val = el.value;
+    document.getElementById(displayId).textContent = val;
+    data.kwh = parseInt(val);
+    // Update gradient
+    const min = el.min, max = el.max;
+    const pct = ((val - min) / (max - min)) * 100;
+    el.style.setProperty('--val', pct + '%');
+  }
+
+  // Init slider gradient
+  window.addEventListener('load', () => {
+    const sl = document.getElementById('kwhSlider');
+    const pct = ((sl.value - sl.min) / (sl.max - sl.min)) * 100;
+    sl.style.setProperty('--val', pct + '%');
+  });
+
+  function checkContacts() {
+    const name = document.getElementById('clientName').value.trim();
+    const phone = document.getElementById('clientPhone').value.trim();
+    const city = document.getElementById('clientCity').value.trim();
+    document.getElementById('next4').disabled = !(name && phone.length > 9 && city);
+  }
+
+  let currentStep = 1;
+
+  function goNext(step) {
+    hideStep(step);
+    currentStep = step + 1;
+    showStep(currentStep);
+    updateDots(currentStep);
+  }
+
+  function goBack(step) {
+    hideStep(step);
+    currentStep = step - 1;
+    showStep(currentStep);
+    updateDots(currentStep);
+  }
+
+  function hideStep(n) {
+    document.getElementById('step' + n).classList.remove('active');
+  }
+
+  function showStep(n) {
+    const el = document.getElementById('step' + n);
+    if (el) {
+      el.classList.remove('active');
+      void el.offsetWidth;
+      el.classList.add('active');
+    }
+  }
+
+  function updateDots(step) {
+    for (let i = 1; i <= 4; i++) {
+      const dot = document.getElementById('dot' + i);
+      if (i < step) {
+        dot.className = 'step-dot done';
+        dot.textContent = '✓';
+      } else if (i === step) {
+        dot.className = 'step-dot active';
+        dot.textContent = i;
+      } else {
+        dot.className = 'step-dot';
+        dot.textContent = i;
+      }
+    }
+    for (let i = 1; i <= 3; i++) {
+      const line = document.getElementById('line' + i);
+      line.className = i < step ? 'step-line done' : 'step-line';
+    }
+  }
+
+  function calculate() {
+    // Facebook Pixel — Lead
+    if(typeof fbq !== 'undefined') fbq('track', 'Lead', {content_name:'СЕС Бриф', value:5000, currency:'USD'});
+    // Hide step 4
+    document.getElementById('step4').classList.remove('active');
+    document.getElementById('loading').classList.add('active');
+
+    setTimeout(() => {
+      document.getElementById('loading').classList.remove('active');
+      buildResult();
+      document.getElementById('result').classList.add('active');
+      document.getElementById('stepsBar').style.display = 'none';
+    }, 2500);
+  }
+
+  function buildResult() {
+    const kwh = data.kwh;
+    // Правильний розрахунок потужності СЕС
+    const peakSun = 4.2; // середні пікові сонячні години для Чернігова
+    const efficiency = 0.75; // ККД системи з урахуванням втрат (інвертор, кабелі, температура)
+    const dailyKwh = kwh / 30; // споживання на день
+    const systemKw = Math.ceil((dailyKwh / (peakSun * efficiency)) * 10) / 10; // кВт системи
+
+    // Кількість панелей (550Вт)
+    const panelW = 550;
+    const panels = Math.ceil(systemKw * 1000 / panelW);
+    const actualKw = (panels * panelW / 1000).toFixed(1);
+
+    // Реальні ціни (оновлено)
+    const panelPrice = panels * 90; // $90 за панель 550W
+    const inverterKw = actualKw <= 5 ? 5 : 10;
+    const inverterPrice = inverterKw <= 5 ? 970 : 1900; // Deye 5кВт / 10кВт
+
+    let batteryPrice = 0;
+    let batteryLabel = '';
+    if (data.battery === 'yes') {
+      // $1000 за 5кВт·год, підбираємо кількість
+      const batteryUnits = kwh < 300 ? 1 : kwh < 600 ? 2 : 3;
+      batteryPrice = batteryUnits * 1000;
+      batteryLabel = `Акумулятор ${batteryUnits * 5} кВт·год (${batteryUnits} × 5кВт·год)`;
+    }
+
+    const mountExtra = data.roofType === 'flat' ? 200 : data.roofType === 'ground' ? 350 : 0;
+    const mountingPrice = Math.round(actualKw * 200 + mountExtra); // $200/кВт
+    const cablesPrice = Math.round(actualKw * 100); // $100/кВт (матеріали)
+
+    const subtotal = panelPrice + inverterPrice + batteryPrice + mountingPrice + cablesPrice;
+    const total = Math.round(subtotal * 1.05); // +5% інші витрати
+
+    // Окупність
+    const savingPerMonth = Math.round(kwh * 4.3); // ~4.3 грн/кВт·год
+    const paybackMonths = Math.round((total / (savingPerMonth / 1000) * 45)); // rough UAH->USD
+    const paybackYears = (paybackYears2 = (total / (savingPerMonth * 0.025))); // $0.025/kWh avg
+    const py = Math.round(paybackYears2 / 12 * 10) / 10;
+
+    // Fill UI
+    document.getElementById('result-sub').textContent =
+      `${document.getElementById('clientName').value}, ось розрахунок для ${document.getElementById('clientCity').value}`;
+
+    document.getElementById('result-grid').innerHTML = `
+      <div class="result-item">
+        <div class="result-item-label">Потужність системи</div>
+        <div class="result-item-value highlight">${actualKw} кВт</div>
+      </div>
+      <div class="result-item">
+        <div class="result-item-label">Кількість панелей</div>
+        <div class="result-item-value">${panels} шт × 550 Вт</div>
+      </div>
+      <div class="result-item">
+        <div class="result-item-label">Вироблення/місяць</div>
+        <div class="result-item-value">${Math.round(actualKw * peakSun * 30 * efficiency)} кВт·год</div>
+      </div>
+      <div class="result-item">
+        <div class="result-item-label">Окупність</div>
+        <div class="result-item-value highlight">~${py} років</div>
+      </div>
+    `;
+
+    let equipHtml = `
+      <div class="equip-row"><span class="equip-name">☀️ Панелі ${panelW}Вт × ${panels}шт</span><span class="equip-price">$${panelPrice}</span></div>
+      <div class="equip-row"><span class="equip-name">⚡ Інвертор Deye ${inverterKw}кВт</span><span class="equip-price">$${inverterPrice}</span></div>
+    `;
+    if (batteryLabel) {
+      equipHtml += `<div class="equip-row"><span class="equip-name">🔋 ${batteryLabel}</span><span class="equip-price">$${batteryPrice}</span></div>`;
+    }
+    equipHtml += `
+      <div class="equip-row"><span class="equip-name">🔧 Монтаж та кріплення</span><span class="equip-price">$${mountingPrice}</span></div>
+      <div class="equip-row"><span class="equip-name">🔌 Матеріали та кабелі</span><span class="equip-price">$${cablesPrice}</span></div>
+    `;
+    document.getElementById('equipment-list').innerHTML = '<div class="equip-title">Склад системи</div>' + equipHtml;
+
+    document.getElementById('total-price').textContent = '$' + total.toLocaleString();
+  }
+
+  const _supabase = window.supabase.createClient(
+    'https://ajvgaxevtjsfmtrmmvgr.supabase.co',
+    'sb_publishable_B7SYnCIvMiAVZQ8XIdR5PA_vavrWc4q'
+  );
+
+  async function saveToSupabase(leadData) {
+    try {
+      await _supabase.from('leads').insert([leadData]);
+    } catch(e) { console.log('Supabase error:', e); }
+  }
+
+  async function sendTelegram(clientData) {
+    const token = '8741925031:AAHacGEzHZFa3OHe81g1C07tTEBEr-jVaHk';
+    const chatId = '503549265';
+    const text = `🌞 НОВА ЗАЯВКА СЕС!\n\n👤 Ім'я: ${clientData.name}\n📞 Телефон: ${clientData.phone}\n📍 Місто: ${clientData.city}\n🏠 Об'єкт: ${clientData.obj}\n⚡ Споживання: ${clientData.kwh} кВт·год/міс\n🔋 Акумулятор: ${clientData.battery}\n📐 Дах: ${clientData.roof}\n💰 Розрахунок: ${clientData.total}`;
+    try {
+      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({chat_id: chatId, text: text})
+      });
+    } catch(e) { console.log('Telegram error:', e); }
+  }
+
+  function showSuccess() {
+    // Facebook Pixel — Purchase
+    if(typeof fbq !== 'undefined') fbq('track', 'Purchase', {value:100, currency:'USD', content_name:'Передоплата СЕС'});
+
+    // Save to Supabase
+    saveToSupabase({
+      name: document.getElementById('clientName').value,
+      phone: document.getElementById('clientPhone').value,
+      city: document.getElementById('clientCity').value,
+      obj_type: data.objType,
+      kwh: data.kwh,
+      battery: data.battery,
+      roof_type: data.roofType,
+      total: document.getElementById('total-price').textContent,
+      status: 'new'
+    });
+
+    // Telegram notification
+    const objLabels = {house: 'Приватний будинок', business: 'Бізнес/підприємство'};
+    const roofLabels = {tilt: 'Скатний дах', flat: 'Плоский дах', ground: 'Наземна установка'};
+    sendTelegram({
+      name: document.getElementById('clientName').value,
+      phone: document.getElementById('clientPhone').value,
+      city: document.getElementById('clientCity').value,
+      obj: objLabels[data.objType] || data.objType,
+      kwh: data.kwh,
+      battery: data.battery === 'yes' ? 'Так' : 'Ні',
+      roof: roofLabels[data.roofType] || data.roofType,
+      total: document.getElementById('total-price').textContent
+    });
+    const result = document.getElementById('result');
+    result.innerHTML = `
+      <div style="text-align:center;padding:20px 0">
+        <div style="font-size:60px;margin-bottom:20px">✅</div>
+        <div class="result-title" style="margin-bottom:12px">Заявку прийнято!</div>
+        <div style="color:var(--muted);font-size:15px;line-height:1.6;margin-bottom:24px">
+          Ми зв'яжемось з вами протягом <strong style="color:var(--sun)">30 хвилин</strong>.<br>
+          Монтажник виїде на об'єкт для безкоштовного огляду.
+        </div>
+        <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:20px">
+          <div style="font-size:13px;color:var(--muted);line-height:1.6">
+            📞 Очікуйте дзвінок від нашого менеджера<br>
+            📍 Виїзд та консультація — <strong style="color:var(--sun)">безкоштовно</strong>
+          </div>
+        </div>
+        <div style="font-size:13px;color:var(--muted)">Дякуємо за довіру!</div>
+      </div>
+    `;
+  }
+</script>
+</body>
+</html>
