@@ -641,7 +641,7 @@
 
   // Load leads
   async function loadLeads() {
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('leads')
       .select('*, installers(name)')
       .order('created_at', { ascending: false });
@@ -780,7 +780,7 @@
     const installer_id = document.getElementById('modalInstaller').value || null;
     const notes = document.getElementById('modalNotes').value;
 
-    const { error } = await supabase
+    const { error } = await db
       .from('leads')
       .update({ status, installer_id, notes })
       .eq('id', id);
@@ -796,7 +796,7 @@
 
   // Load installers
   async function loadInstallers() {
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('installers')
       .select('*')
       .order('created_at', { ascending: false });
