@@ -608,7 +608,9 @@
 <script>
   const SUPABASE_URL = 'https://ajvgaxevtjsfmtrmmvgr.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_B7SYnCIvMiAVZQ8XIdR5PA_vavrWc4q';
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: { persistSession: false }
+  });
 
   let allLeads = [];
   let allInstallers = [];
@@ -828,8 +830,8 @@
 
   // Stats page
   async function loadStats() {
-    const { data: leads } = await supabase.from('leads').select('status, total');
-    const { data: installers } = await supabase.from('installers').select('id');
+    const { data: leads } = await db.from('leads').select('status, total');
+    const { data: installers } = await db.from('installers').select('id');
 
     const total = leads?.length || 0;
     const done = leads?.filter(l => l.status === 'done').length || 0;
@@ -854,8 +856,10 @@
   });
 
   // Init
-  loadLeads();
-  loadInstallers();
+  document.addEventListener('DOMContentLoaded', () => {
+    loadLeads();
+    loadInstallers();
+  });
 </script>
 </body>
 </html>
