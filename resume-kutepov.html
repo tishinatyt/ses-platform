@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Кутепов Дмитро — Резюме</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --ink: #0f1923;
+    --ink2: #2a3a4a;
+    --muted: #7a8a9a;
+    --accent: #c8922a;
+    --accent2: #e8b84b;
+    --light: #f5f2ee;
+    --white: #ffffff;
+    --border: #e2ddd6;
+  }
+
+  @media print {
+    body { background: white !important; }
+    .page { box-shadow: none !important; margin: 0 !important; border-radius: 0 !important; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  body {
+    background: #e8e4de;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 40px 20px;
+  }
+
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+    background: var(--white);
+    box-shadow: 0 20px 80px rgba(0,0,0,0.15);
+    border-radius: 4px;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    min-height: 1100px;
+  }
+
+  /* LEFT COLUMN */
+  .left {
+    background: var(--ink);
+    padding: 48px 32px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .left::before {
+    content: '';
+    position: absolute;
+    top: -60px;
+    right: -60px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: rgba(200,146,42,0.08);
+  }
+
+  .left::after {
+    content: '';
+    position: absolute;
+    bottom: 40px;
+    left: -40px;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: rgba(200,146,42,0.05);
+  }
+
+  /* Avatar */
+  .avatar-wrap {
+    position: relative;
+    width: 110px;
+    height: 110px;
+    margin: 0 auto 28px;
+  }
+
+  .avatar-ring {
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+  }
+
+  .avatar-inner {
+    position: absolute;
+    inset: 3px;
+    border-radius: 50%;
+    background: var(--ink2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--accent2);
+    letter-spacing: 1px;
+  }
+
+  .left-name {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .left-name h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--white);
+    line-height: 1.2;
+    margin-bottom: 6px;
+  }
+
+  .left-name .title {
+    font-size: 11px;
+    color: var(--accent2);
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    font-weight: 500;
+  }
+
+  .divider {
+    width: 40px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+    margin: 0 auto 28px;
+  }
+
+  /* Contact */
+  .section-title-left {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+
+  .contact-list {
+    list-style: none;
+    margin-bottom: 32px;
+  }
+
+  .contact-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 12px;
+    font-size: 12.5px;
+    color: rgba(255,255,255,0.75);
+    line-height: 1.4;
+  }
+
+  .contact-list li .icon {
+    color: var(--accent2);
+    font-size: 14px;
+    margin-top: 1px;
+    flex-shrink: 0;
+  }
+
+  /* Skills */
+  .skill-item {
+    margin-bottom: 14px;
+  }
+
+  .skill-name {
+    font-size: 12px;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .skill-bar {
+    height: 3px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .skill-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+  }
+
+  /* Tags */
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 32px;
+  }
+
+  .tag {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 3px;
+    padding: 4px 10px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.65);
+  }
+
+  /* RIGHT COLUMN */
+  .right {
+    padding: 48px 44px;
+    background: var(--white);
+  }
+
+  .right-header {
+    margin-bottom: 36px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .right-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 38px;
+    font-weight: 900;
+    color: var(--ink);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .right-header h2 span {
+    color: var(--accent);
+  }
+
+  .right-header .subtitle {
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-bottom: 16px;
+  }
+
+  .summary {
+    font-size: 13.5px;
+    color: var(--ink2);
+    line-height: 1.7;
+    max-width: 480px;
+  }
+
+  /* Section */
+  .section {
+    margin-bottom: 32px;
+  }
+
+  .section-title {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Experience */
+  .exp-item {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 0 20px;
+    margin-bottom: 24px;
+    position: relative;
+  }
+
+  .exp-item::before {
+    content: '';
+    position: absolute;
+    left: 120px;
+    top: 8px;
+    bottom: -24px;
+    width: 1px;
+    background: var(--border);
+  }
+
+  .exp-item:last-child::before { display: none; }
+
+  .exp-date {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 500;
+    padding-top: 4px;
+    text-align: right;
+    line-height: 1.4;
+  }
+
+  .exp-dot {
+    position: absolute;
+    left: 116px;
+    top: 6px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--white);
+    box-shadow: 0 0 0 1px var(--accent);
+  }
+
+  .exp-content {
+    padding-left: 20px;
+  }
+
+  .exp-role {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+
+  .exp-company {
+    font-size: 12px;
+    color: var(--accent);
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+
+  .exp-desc {
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* Education & extras */
+  .edu-item {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 14px;
+    align-items: flex-start;
+  }
+
+  .edu-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--light);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .edu-text h4 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+
+  .edu-text p {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* Qualities grid */
+  .qualities {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .quality {
+    background: var(--light);
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: var(--ink2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .quality::before {
+    content: '✦';
+    color: var(--accent);
+    font-size: 10px;
+    flex-shrink: 0;
+  }
+
+  /* Print button */
+  .print-btn {
+    display: block;
+    margin: 24px auto 0;
+    padding: 12px 32px;
+    background: var(--ink);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    letter-spacing: 1px;
+  }
+
+  @media print { .print-btn { display: none; } }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- LEFT -->
+  <div class="left">
+    <div class="avatar-wrap">
+      <div class="avatar-ring"></div>
+      <div class="avatar-inner">ДК</div>
+    </div>
+
+    <div class="left-name">
+      <h1>Кутепов<br>Дмитро</h1>
+      <div class="title">Підприємець · Маркетолог</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section-title-left">Контакти</div>
+    <ul class="contact-list">
+      <li><span class="icon">📍</span> Чернігів, Україна</li>
+      <li><span class="icon">📞</span> +38 (093) 282-61-55</li>
+      <li><span class="icon">✉️</span> ceo@colibri.org.ua</li>
+      <li><span class="icon">📅</span> 12.07.1980</li>
+    </ul>
+
+    <div class="section-title-left">Компетенції</div>
+    <div style="margin-bottom:32px">
+      <div class="skill-item">
+        <div class="skill-name"><span>Digital Marketing</span></div>
+        <div class="skill-bar"><div class="skill-fill" style="width:95%"></div></div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-name"><span>Facebook / Google Ads</span></div>
+        <div class="skill-bar"><div class="skill-fill" style="width:90%"></div></div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-name"><span>No-code розробка</span></div>
+        <div class="skill-bar"><div class="skill-fill" style="width:85%"></div></div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-name"><span>Управління бізнесом</span></div>
+        <div class="skill-bar"><div class="skill-fill" style="width:90%"></div></div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-name"><span>SMM / Контент</span></div>
+        <div class="skill-bar"><div class="skill-fill" style="width:88%"></div></div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-name"><span>Продажі / Переговори</span></div>
+        <div class="skill-bar"><div class="skill-fill" style="width:85%"></div></div>
+      </div>
+    </div>
+
+    <div class="section-title-left">Інструменти</div>
+    <div class="tags">
+      <span class="tag">Canva</span>
+      <span class="tag">Google Ads</span>
+      <span class="tag">Facebook Ads</span>
+      <span class="tag">Чат-боти</span>
+      <span class="tag">CRM</span>
+      <span class="tag">Supabase</span>
+      <span class="tag">No-code</span>
+      <span class="tag">AI Tools</span>
+    </div>
+
+    <div class="section-title-left">Мови</div>
+    <div class="skill-item">
+      <div class="skill-name"><span style="color:rgba(255,255,255,0.8)">Українська</span></div>
+      <div class="skill-bar"><div class="skill-fill" style="width:100%"></div></div>
+    </div>
+    <div class="skill-item">
+      <div class="skill-name"><span style="color:rgba(255,255,255,0.8)">Російська</span></div>
+      <div class="skill-bar"><div class="skill-fill" style="width:100%"></div></div>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right">
+    <div class="right-header">
+      <div class="subtitle">Резюме · 2025</div>
+      <h2>Дмитро <span>Кутепов</span></h2>
+      <p class="summary">
+        Підприємець з понад 15-річним досвідом у маркетингу, управлінні бізнесом та організації. Поєдную стратегічне мислення з практичними навичками в digital-маркетингу та no-code розробці. Вмію будувати процеси з нуля та масштабувати бізнес.
+      </p>
+    </div>
+
+    <!-- Experience -->
+    <div class="section">
+      <div class="section-title">Досвід роботи</div>
+
+      <div class="exp-item">
+        <div class="exp-date">2008 —<br>тепер</div>
+        <div class="exp-dot"></div>
+        <div class="exp-content">
+          <div class="exp-role">Власник / Digital-маркетолог</div>
+          <div class="exp-company">ФОП · Чернігів</div>
+          <div class="exp-desc">Повний спектр digital-послуг: розробка сайтів та лендінгів (no-code), SMM, таргетована реклама Facebook/Instagram, Google Ads, чат-боти, відеопродакшн. Аутсорс для автоцентрів Метек (Skoda, Citroën, Peugeot, Mitsubishi) та книгарні Intellia.</div>
+        </div>
+      </div>
+
+      <div class="exp-item">
+        <div class="exp-date">2006 —<br>тепер</div>
+        <div class="exp-dot"></div>
+        <div class="exp-content">
+          <div class="exp-role">Голова фонду</div>
+          <div class="exp-company">ЧМГО «Фонд підтримки та розвитку міста» · Чернігів</div>
+          <div class="exp-desc">Організація благодійних та волонтерських заходів. Пошук спонсорів та партнерів. Адміністративне управління.</div>
+        </div>
+      </div>
+
+      <div class="exp-item">
+        <div class="exp-date">2005 —<br>2012</div>
+        <div class="exp-dot"></div>
+        <div class="exp-content">
+          <div class="exp-role">Директор</div>
+          <div class="exp-company">ТОВ «Артефакт-плюс» · Чернігів</div>
+          <div class="exp-desc">Організація та розміщення рекламних носіїв. Взаємодія з органами місцевої влади. Побудова ділових відносин із замовниками.</div>
+        </div>
+      </div>
+
+      <div class="exp-item">
+        <div class="exp-date">2003 —<br>2005</div>
+        <div class="exp-dot"></div>
+        <div class="exp-content">
+          <div class="exp-role">Директор</div>
+          <div class="exp-company">ТОВ «Топенерго» · Київ</div>
+          <div class="exp-desc">Реєстрація та організація роботи компанії. Контроль транспорту, ПММ та зв'язку. Забезпечення підприємства ресурсами.</div>
+        </div>
+      </div>
+
+      <div class="exp-item">
+        <div class="exp-date">2002 —<br>2003</div>
+        <div class="exp-dot"></div>
+        <div class="exp-content">
+          <div class="exp-role">Технік електрозв'язку</div>
+          <div class="exp-company">ВАТ «Укртелеком» · Чернігів</div>
+          <div class="exp-desc">Обслуговування технічної бази інтернет-кафе. Допомога клієнтам у отриманні послуг.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Education -->
+    <div class="section">
+      <div class="section-title">Освіта</div>
+      <div class="edu-item">
+        <div class="edu-icon">🎓</div>
+        <div class="edu-text">
+          <h4>Чернігівський технологічний університет</h4>
+          <p>Облік та аудит · Неповна вища освіта</p>
+        </div>
+      </div>
+      <div class="edu-item">
+        <div class="edu-icon">⚔️</div>
+        <div class="edu-text">
+          <h4>Строкова служба ЗСУ</h4>
+          <p>2000–2001 · Молодший сержант, командир танку</p>
+        </div>
+      </div>
+      <div class="edu-item">
+        <div class="edu-icon">📚</div>
+        <div class="edu-text">
+          <h4>Безперервна самоосвіта</h4>
+          <p>Економіка, менеджмент, нейромережі, психологія, AI-інструменти</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Qualities -->
+    <div class="section">
+      <div class="section-title">Особисті якості</div>
+      <div class="qualities">
+        <div class="quality">Аналітичне мислення</div>
+        <div class="quality">Висока бізнес-емпатія</div>
+        <div class="quality">Дії в критичних ситуаціях</div>
+        <div class="quality">Творчий підхід</div>
+        <div class="quality">Незалежність та ініціатива</div>
+        <div class="quality">Вміння переконувати</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<button class="print-btn" onclick="window.print()">🖨️ Роздрукувати / Зберегти PDF</button>
+
+</body>
+</html>
