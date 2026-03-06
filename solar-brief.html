@@ -994,8 +994,11 @@ src="https://www.facebook.com/tr?id=190661670459848&ev=PageView&noscript=1"/></n
 
   async function saveToSupabase(leadData) {
     try {
-      await _supabase.from('leads').insert([leadData]);
-    } catch(e) { console.log('Supabase error:', e); }
+      const { data, error } = await _supabase.from('leads').insert([leadData]);
+      if (error) console.log('Supabase insert error:', JSON.stringify(error));
+      else console.log('Supabase OK:', JSON.stringify(data));
+    } catch(e) { console.log('Supabase exception:', e); }
+  }
   }
 
   async function sendTelegram(clientData) {
@@ -1025,7 +1028,7 @@ src="https://www.facebook.com/tr?id=190661670459848&ev=PageView&noscript=1"/></n
       battery: data.battery,
       roof_type: data.roofType,
       total: document.getElementById('total-price').textContent,
-      status: 'new'
+      status: 'новий'
     });
 
     // Telegram notification
