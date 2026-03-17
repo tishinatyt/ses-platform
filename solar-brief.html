@@ -478,6 +478,88 @@
     color: var(--sun);
   }
 
+  /* Credit calculator */
+  .credit-block {
+    background: rgba(0,122,255,0.05);
+    border: 1px solid rgba(0,122,255,0.2);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+
+  .credit-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #4DA6FF;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+
+  .credit-subtitle {
+    font-size: 13px;
+    color: var(--green);
+    font-weight: 500;
+    margin-bottom: 18px;
+  }
+
+  .term-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+  }
+
+  .term-btn {
+    flex: 1;
+    min-width: 52px;
+    background: var(--dark2);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 4px;
+    color: var(--muted);
+    font-family: 'Unbounded', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+  }
+
+  .term-btn:hover { border-color: rgba(77,166,255,0.4); color: var(--text); }
+
+  .term-btn.active {
+    background: rgba(77,166,255,0.12);
+    border-color: #4DA6FF;
+    color: #4DA6FF;
+  }
+
+  .credit-payment-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--dark2);
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-bottom: 12px;
+  }
+
+  .credit-payment-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 4px;
+  }
+
+  .credit-payment-value {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #4DA6FF;
+  }
+
   .cta-block {
     text-align: center;
   }
@@ -776,6 +858,32 @@ src="https://www.facebook.com/tr?id=190661670459848&ev=PageView&noscript=1"/></n
       <div class="total-value" id="total-price">—</div>
     </div>
 
+    <!-- Credit calculator -->
+    <div class="credit-block" id="creditBlock">
+      <div class="credit-title">🏦 Кредит ПриватБанк — "Джерела енергії"</div>
+      <div class="credit-subtitle">✅ 0% — державна програма підтримки</div>
+      <div class="term-buttons">
+        <button class="term-btn" onclick="selectTerm(12, this)">12 міс</button>
+        <button class="term-btn active" onclick="selectTerm(24, this)">24 міс</button>
+        <button class="term-btn" onclick="selectTerm(36, this)">36 міс</button>
+        <button class="term-btn" onclick="selectTerm(48, this)">48 міс</button>
+        <button class="term-btn" onclick="selectTerm(60, this)">60 міс</button>
+      </div>
+      <div class="credit-payment-row">
+        <div>
+          <div class="credit-payment-label">Щомісячний платіж</div>
+          <div class="credit-payment-value" id="creditMonthly">—</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Разова комісія 1,5%</div>
+          <div style="font-family:'Unbounded',sans-serif;font-size:15px;color:var(--muted)" id="creditCommission">—</div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.6">
+        Ставка 0% річних · Термін до 60 місяців · Без застави
+      </div>
+    </div>
+
     <div class="cta-block">
       <button class="btn-cta" onclick="showSuccess()">📞 ЗАМОВИТИ БЕЗКОШТОВНИЙ ВИЇЗД</button>
       <div class="cta-note">Менеджер зв'яжеться з вами протягом 30 хвилин</div>
@@ -791,6 +899,23 @@ src="https://www.facebook.com/tr?id=190661670459848&ev=PageView&noscript=1"/></n
     battery: null,
     kwh: 300
   };
+
+  let _creditTotalUAH = 0;
+  let _selectedTerm = 24;
+
+  function updateCredit() {
+    const monthly = Math.round(_creditTotalUAH / _selectedTerm);
+    const commission = Math.round(_creditTotalUAH * 0.015);
+    document.getElementById('creditMonthly').textContent = monthly.toLocaleString('uk-UA') + ' грн';
+    document.getElementById('creditCommission').textContent = commission.toLocaleString('uk-UA') + ' грн';
+  }
+
+  function selectTerm(months, btn) {
+    _selectedTerm = months;
+    document.querySelectorAll('.term-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    updateCredit();
+  }
 
   function selectOption(btn, field, value) {
     // Clear siblings in same group
@@ -919,7 +1044,9 @@ src="https://www.facebook.com/tr?id=190661670459848&ev=PageView&noscript=1"/></n
         kwh: data.kwh,
         battery: data.battery === 'yes' ? 'Так' : 'Ні',
         roof: _roofLabels[data.roofType] || data.roofType,
-        total: leadData.total
+        total: leadData.total,
+        creditTerm: _selectedTerm,
+        creditMonthly: Math.round(_creditTotalUAH / _selectedTerm)
       });
     }, 2500);
   }
@@ -1013,6 +1140,11 @@ src="https://www.facebook.com/tr?id=190661670459848&ev=PageView&noscript=1"/></n
     document.getElementById('equipment-list').innerHTML = '<div class="equip-title">Склад системи</div>' + equipHtml;
 
     document.getElementById('total-price').textContent = '$' + totalUSD.toLocaleString() + ' (~' + Math.round(totalUAH/1000) + 'k грн)';
+
+    // Init credit calculator
+    _creditTotalUAH = totalUAH;
+    _selectedTerm = 24;
+    updateCredit();
   }
 
   const _supabase = window.supabase.createClient(
@@ -1031,7 +1163,10 @@ src="https://www.facebook.com/tr?id=190661670459848&ev=PageView&noscript=1"/></n
   async function sendTelegram(clientData) {
     const token = '8741925031:AAHacGEzHZFa3OHe81g1C07tTEBEr-jVaHk';
     const chatId = '503549265';
-    const text = `🌞 НОВА ЗАЯВКА СЕС!\n\n👤 Ім'я: ${clientData.name}\n📞 Телефон: ${clientData.phone}\n📍 Місто: ${clientData.city}\n🏠 Об'єкт: ${clientData.obj}\n⚡ Споживання: ${clientData.kwh} кВт·год/міс\n🔋 Акумулятор: ${clientData.battery}\n📐 Дах: ${clientData.roof}\n💰 Розрахунок: ${clientData.total}`;
+    const creditLine = clientData.creditTerm
+      ? `\n🏦 Кредит: ${clientData.creditTerm} міс → ${clientData.creditMonthly.toLocaleString()} грн/міс (0%)`
+      : '';
+    const text = `🌞 НОВА ЗАЯВКА СЕС!\n\n👤 Ім'я: ${clientData.name}\n📞 Телефон: ${clientData.phone}\n📍 Місто: ${clientData.city}\n🏠 Об'єкт: ${clientData.obj}\n⚡ Споживання: ${clientData.kwh} кВт·год/міс\n🔋 Акумулятор: ${clientData.battery}\n📐 Дах: ${clientData.roof}\n💰 Розрахунок: ${clientData.total}${creditLine}`;
     try {
       await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
         method: 'POST',
