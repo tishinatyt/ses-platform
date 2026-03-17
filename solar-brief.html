@@ -895,6 +895,32 @@ src="https://www.facebook.com/tr?id=190661670459848&ev=PageView&noscript=1"/></n
       buildResult();
       document.getElementById('result').classList.add('active');
       document.getElementById('stepsBar').style.display = 'none';
+
+      // Зберегти лід і відправити в Telegram одразу після розрахунку
+      const _objLabels = {house: 'Приватний будинок', business: 'Бізнес/підприємство'};
+      const _roofLabels = {tilt: 'Скатний дах', flat: 'Плоский дах', ground: 'Наземна установка'};
+      const leadData = {
+        name: document.getElementById('clientName').value,
+        phone: document.getElementById('clientPhone').value,
+        city: document.getElementById('clientCity').value,
+        obj_type: data.objType,
+        kwh: data.kwh,
+        battery: data.battery,
+        roof_type: data.roofType,
+        total: document.getElementById('total-price').textContent,
+        status: 'новий'
+      };
+      saveToSupabase(leadData);
+      sendTelegram({
+        name: leadData.name,
+        phone: leadData.phone,
+        city: leadData.city,
+        obj: _objLabels[data.objType] || data.objType,
+        kwh: data.kwh,
+        battery: data.battery === 'yes' ? 'Так' : 'Ні',
+        roof: _roofLabels[data.roofType] || data.roofType,
+        total: leadData.total
+      });
     }, 2500);
   }
 
@@ -922,11 +948,13 @@ src="https://www.facebook.com/tr?id=190661670459848&ev=PageView&noscript=1"/></n
     const inverterKw = actualKw <= 5 ? 5 : 10;
     const inverterPriceUAH = inverterKw <= 5 ? 42500 : 85000;
 
-    // --- Кріплення та кабель (~1430 грн/кВт + 300 доставка/кВт) ---
-    const mountingUAH = Math.round(actualKw * 1430 + actualKw * 300);
+    // --- Кріплення та кабель: 5кВт=25,000грн, 10кВт=43,000грн (лінійна інтерполяція) ---
+    const mountingUAH = actualKw <= 5
+      ? Math.round(actualKw * 5000)
+      : Math.round(25000 + (actualKw - 5) * 3600);
 
-    // --- Робота: $85/кВт ---
-    const workUAH = Math.round(actualKw * 85 * UAH);
+    // --- Робота: 5кВт=30,000грн, 10кВт=60,000грн (6,000 грн/кВт) ---
+    const workUAH = Math.round(actualKw * 6000);
 
     // --- АКБ: 2 × кВт панелей (Deye 5кВт = 42500 грн) ---
     let batteryUAH = 0;
@@ -1017,32 +1045,6 @@ src="https://www.facebook.com/tr?id=190661670459848&ev=PageView&noscript=1"/></n
     // Facebook Pixel — Purchase
     if(typeof fbq !== 'undefined') fbq('track', 'Purchase', {value:100, currency:'USD', content_name:'Передоплата СЕС'});
 
-    // Save to Supabase
-    saveToSupabase({
-      name: document.getElementById('clientName').value,
-      phone: document.getElementById('clientPhone').value,
-      city: document.getElementById('clientCity').value,
-      obj_type: data.objType,
-      kwh: data.kwh,
-      battery: data.battery,
-      roof_type: data.roofType,
-      total: document.getElementById('total-price').textContent,
-      status: 'новий'
-    });
-
-    // Telegram notification
-    const objLabels = {house: 'Приватний будинок', business: 'Бізнес/підприємство'};
-    const roofLabels = {tilt: 'Скатний дах', flat: 'Плоский дах', ground: 'Наземна установка'};
-    sendTelegram({
-      name: document.getElementById('clientName').value,
-      phone: document.getElementById('clientPhone').value,
-      city: document.getElementById('clientCity').value,
-      obj: objLabels[data.objType] || data.objType,
-      kwh: data.kwh,
-      battery: data.battery === 'yes' ? 'Так' : 'Ні',
-      roof: roofLabels[data.roofType] || data.roofType,
-      total: document.getElementById('total-price').textContent
-    });
     const result = document.getElementById('result');
     result.innerHTML = `
       <div style="text-align:center;padding:20px 0">
